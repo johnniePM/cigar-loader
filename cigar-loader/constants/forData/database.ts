@@ -43,3 +43,7 @@ export interface IHistory {
     self_used:boolean
 }
 
+export interface IUpdate extends Partial<IHistory> , Partial<ILibrary> , Partial<ICigar> , Partial<IHumidor> , Partial<IBrand>{
+    
+}
+
