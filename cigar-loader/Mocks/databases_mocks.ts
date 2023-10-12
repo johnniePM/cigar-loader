@@ -1,4 +1,4 @@
-import { IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "../constants/forData/database"
+import { IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "../constants/database"
 
 export const CreateBrandTable = `CREATE TABLE IF NOT EXISTS Brand (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,7 +97,7 @@ export const DeleteFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library"
     return (`DELETE FROM ${table} WHERE id = ${id};`)
 }
 
-export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", value?: string, the_key: keyof IUpdate = "id") => {
+export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",  the_key: keyof IUpdate = "id", value?: string,) => {
     if (value!=undefined){
         return (`SELECT * FROM ${table} WHERE ${the_key} = ${value};`)
     }else{
