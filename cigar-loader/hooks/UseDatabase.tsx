@@ -4,6 +4,7 @@ import * as SQLite from 'expo-sqlite';
 import { IBrand, ICigar, IHistory, IHumidor, ILibrary } from "../constants";
 import { MDATABASE } from "../Mocks";
 import { IUpdate } from "../constants/database";
+import { IUseDatabase } from "../constants/Components";
 
 export const DataContext = React.createContext({});
 
@@ -15,20 +16,12 @@ function openDatabase() {
 }
 
 function isResultSet(object: any): object is SQLite.SQLResultSet {
-  console.log("'member' in object")
-  console.log("rows" in object)
-  console.log("'member' in object")
   return 'rows' in object;
 }
 
 const db = openDatabase();
 
 export const DatabaseProvider = ({ children }: { children: React.ReactNode }) => {
-  const [Brand, setBrand] = useState<Array<IBrand>>()
-  const [Humidor, setHumidor] = useState<Array<IHumidor>>()
-  const [Cigar, setCigar] = useState<Array<ICigar>>()
-  const [Library, setLibrary] = useState<Array<ILibrary>>()
-  const [History, setHistory] = useState<Array<IHistory>>()
 
   const create_tables =useCallback(()=> {
     db.transactionAsync(async (exc) => {
@@ -38,9 +31,7 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
       exc.executeSqlAsync(MDATABASE.CreateHumidorTable);
       exc.executeSqlAsync(MDATABASE.CreateLibraryTable);
     }).then(() => {
-      console.log("Done")
     }, (reason) => {
-      console.log(reason)
     })
   }, [])
 
@@ -59,7 +50,6 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
       // }
       // setBrand(arr)
     }, (reason) => {
-      console.log(reason)
     })
   }, [])
 
@@ -70,7 +60,6 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
       })
     }).then(() => {
     }, (reason) => {
-      console.log(reason)
     })
   }, [])
 
@@ -81,7 +70,6 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
       })
     }).then(() => {
     }, (reason) => {
-      console.log(reason)
     })
   }, [])
 
@@ -92,7 +80,6 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
       })
     }).then(() => {
     }, (reason) => {
-      console.log(reason)
     })
   }, [])
 
@@ -103,44 +90,41 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
       })
     }).then(() => {
     }, (reason) => {
-      console.log(reason)
     })
   }, [])
 
 
   const edit_table = useCallback((table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number, update: IUpdate) => {
     db.transactionAsync(async (exc) => {
-      exc.executeSqlAsync(MDATABASE.EditTable(table, id, update)).then(() => {
-      })
+      exc.executeSqlAsync(MDATABASE.EditTable(table, id, update)).then((val) => {
+      }).catch((e)=>{console.log("dsadas"); console.log(e)})
     }).then(() => {
     }, (reason) => {
-      console.log(reason)
     })
   }, [])
 
 
-  const delete_from_table = useCallback((table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number) => {
+  const delete_from_table = useCallback( (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number) => {
     db.transactionAsync(async (exc) => {
       exc.executeSqlAsync(MDATABASE.DeleteFromTable(table, id)).then(() => {
       })
     }).then(() => {
     }, (reason) => {
-      console.log(reason)
     })
   }, [])
 
-  
-  const select_from_table = useCallback((table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", value?: string, the_key: keyof IUpdate = "id") => {
-    db.transactionAsync(async (exc) => {
-      exc.executeSqlAsync(value != undefined ? MDATABASE.SelectFromTable(table, the_key, value) : MDATABASE.SelectFromTable(table)).then(() => {
+  const select_from_table = useCallback((table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",setState?:React.Dispatch<React.SetStateAction<any>>, value?: string, the_key: keyof IUpdate = "id" ) => {
+     db.transactionAsync(async (exc) => {
+       exc.executeSqlAsync(value != undefined ? MDATABASE.SelectFromTable(table, the_key, value) : MDATABASE.SelectFromTable(table)).then((val) => {
+          if (isResultSet(val)) {
+            if(setState!=undefined){
+
+              setState(val["rows"])
+            }
+          } else {
+          }
+        
       })
-    }).then((val) => {
-      if (isResultSet(val)) {
-        console.log(val.rows)
-      } else {
-      }
-    }, (reason) => {
-      console.log(reason)
     })
   }, [])
 
@@ -152,6 +136,7 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
     return () => {
     }
   }, [])
+
 
 
   const contextValue = {
@@ -174,7 +159,7 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
   );
 };
 
-export const UseDatabase = () => useContext(DataContext);
+export const UseDatabase = () => useContext(DataContext) as IUseDatabase;
 
 
 // fexport const useData = () => useContext(DataContext) as IUseData;

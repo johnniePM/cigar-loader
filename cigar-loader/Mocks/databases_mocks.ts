@@ -85,7 +85,7 @@ export const EditTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "Hi
 
     Object.keys(update).map((i, e) => {
         const rest = e < last_index ? " , " : " "
-        the_string += String(i) + " = " + update[i as keyof IUpdate] + rest
+        the_string += String(i) + " = " + "'"+ update[i as keyof IUpdate]+"'" + rest
     })
 
     return (`UPDATE ${table} SET ${the_string} WHERE id = ${id}`)

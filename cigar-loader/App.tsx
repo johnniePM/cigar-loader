@@ -1,13 +1,20 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { DatabaseProvider } from './hooks/UseDatabase';
+import { Appearance, useColorScheme } from 'react-native';
+import Main from './Main';
+
 export default function App() {
+  const theme = useColorScheme()
+  const appe = Appearance
+  console.log(theme)
+  console.log(appe.getColorScheme())
   return (
     <DatabaseProvider>
-      <View style={styles.container}>
-        <Text>Open up App.tsx to start working on your app!</Text>
-        <StatusBar style="auto" />
-      </View>
+      <StatusBar style="auto" backgroundColor='#00000000' translucent={false}  />
+      {/* <SafeAreaView> */}
+        <Main />
+      {/* </SafeAreaView> */}
     </DatabaseProvider>
   );
 }
