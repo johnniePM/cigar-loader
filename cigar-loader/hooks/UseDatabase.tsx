@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import * as SQLite from 'expo-sqlite';
 import { IBrand, ICigar, IHistory, IHumidor, ILibrary } from "../constants";
 import { MDATABASE } from "../Mocks";
-import { IUpdate } from "../constants/database";
+import { IUpdate } from "../constants/data";
 import { IUseDatabase } from "../constants/Components";
 
 export const DataContext = React.createContext({});

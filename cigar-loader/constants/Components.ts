@@ -1,4 +1,4 @@
-import { IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "./database";
+import { IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "./data";
 
 export interface IUseDatabase {
     add_to_brand:(brand?: IBrand) => void;

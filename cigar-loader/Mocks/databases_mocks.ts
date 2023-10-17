@@ -1,4 +1,4 @@
-import { IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "../constants/database"
+import { IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "../constants/data"
 
 export const CreateBrandTable = `CREATE TABLE IF NOT EXISTS Brand (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

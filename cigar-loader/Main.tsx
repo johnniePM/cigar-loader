@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { PaperProvider, useTheme  } from 'react-native-paper';
 import Item from './Item';
 import Menu from './navigation/Menu';
+import { SettingsProvider } from './hooks/UseSettings';
 
 
 export default function Main() {
@@ -11,9 +12,11 @@ export default function Main() {
     console.log(theme.dark)
     return (
         <PaperProvider>
+            <SettingsProvider>
 
 
             <Menu/>
+            </SettingsProvider>
         </PaperProvider>
     );
 }

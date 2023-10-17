@@ -4,9 +4,13 @@ import {
     IHistory,
     IHumidor,
     ILibrary,
-    QRcode64
-} from "./database"
+    QRcode64,
+    ISettings
+} from "./data"
 import { IUseDatabase } from "./Components"
+
+
+
 export {
     IBrand,
     ICigar,
@@ -14,6 +18,7 @@ export {
     IHumidor,
     ILibrary,
     QRcode64,
-    IUseDatabase
+    IUseDatabase,
+    ISettings
 
 }

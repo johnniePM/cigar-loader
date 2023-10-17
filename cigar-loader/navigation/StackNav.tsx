@@ -9,13 +9,15 @@ import Cigar from '../screens/Cigar';
 import History from '../screens/History';
 import Library from '../screens/Library';
 import AddCigar from '../screens/AddCigar';
+import Settings from '../screens/Settings';
 
 export type RootStackParamList = {
   Home:any;
   Cigar:any;
   AddCigar:any;
   History:any;
-  Library:any
+  Library:any;
+  Settings:any
 };
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -53,7 +55,13 @@ export default () => {
       <Stack.Screen
         name="History"
         component={History}
-        options={{ headerShown: false }}
+        options={{  }}
+        // options={{title: 'Hem',}}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={Settings}
+        options={{  }}
         // options={{title: 'Hem',}}
       />
     

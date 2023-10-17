@@ -28,9 +28,10 @@ import {
 } from 'react-native-paper';
 
 interface ScreenType {
-    name: string;
-    to: string;
+    name: "Home"|"History"|"Settings";
+    to: "Home"|"History"|"Settings";
     icon: keyof typeof Ionicons.glyphMap;
+    icon_outline: keyof typeof Ionicons.glyphMap;
 }
 
 const Drawer = createDrawerNavigator();
@@ -100,16 +101,15 @@ const ScreensStack = () => {
 
 const DrawerContent = (props) => {
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-    const [visible, setVisible] = useState<boolean>(false);
-
-    const [active, setActive] = useState<"History" | "Home">()
+    const [active, setActive] = useState<"History" | "Home"|"Settings">("Home")
 
     const handleNavigation = useCallback(
-        (to: "History" | "Home") => {
+        (to: "History" | "Home"|"Settings") => {
             setActive(to);
             navigation.navigate(to);
         },
         [navigation, setActive]
+
     );
     const { colors, isV3 } = useTheme();
 
@@ -128,12 +128,11 @@ const DrawerContent = (props) => {
 
     // screen list for Drawer menu
     const screens: ScreenType[] = [
-        { name: "Hem", to: "Home", icon: "home" },
-        { name: "Produkter", to: "Produkt", icon: "ios-albums-outline" },
+        { name: "Home", to: "Home", icon_outline: "home-outline", icon: "home" },
+        { name: "History", to: "History", icon_outline: "book-outline", icon: "book" },
+        { name: "Settings", to: "Settings", icon_outline: "settings-outline", icon: "settings" },
         // { name: "Produkter", to: 'Produkter', icon: assets.home },
-        { name: "Statistik", to: "DateSelector", icon: "analytics" },
-        { name: "Z rapport", to: "ZRapport", icon: "receipt-outline" },
-        { name: "HandScanner", to: "HandScanner", icon: "camera-outline" },
+
     ];
 
 
@@ -172,16 +171,19 @@ const DrawerContent = (props) => {
                 </View>
 
                 <PaperDrawer.Section style={styles.drawerSection} title="">
-                    <PaperDrawer.Item
-                        label="Home"
-                        active={active === 'Home'}
-                        onPress={() => setActive('Home')}
-                    />
-                    <PaperDrawer.Item
-                        label="History"
-                        active={active === 'History'}
-                        onPress={() => setActive('History')}
-                    />
+                {screens?.map((screen, index) => {
+          const isActive = active === screen.to;
+          return(
+
+              <PaperDrawer.Item
+                  label={screen.name}
+                  icon={()=>{return(<Ionicons name={isActive?screen.icon:screen.icon_outline} size={20} />)}}
+                  active={isActive}
+                  onPress={() => handleNavigation(screen.to)}
+              />
+          )
+          })}
+
                 </PaperDrawer.Section>
 
 
@@ -197,25 +199,17 @@ export default function Menu() {
 
     const [isReady, setIsReady] = React.useState(false);
     const [initialState, setInitialState] = React.useState<
-        InitialState | undefined
-    >();
-
+        InitialState | undefined>();
     const [isDarkMode, setIsDarkMode] = React.useState(false);
-    const [themeVersion, setThemeVersion] = React.useState<2 | 3>(3);
     const [collapsed, setCollapsed] = React.useState(false);
 
     const themeMode = isDarkMode ? 'dark' : 'light';
 
     const theme = {
-        2: {
-            light: MD2LightTheme,
-            dark: MD2DarkTheme,
-        },
-        3: {
+
             light: MD3LightTheme,
             dark: MD3DarkTheme,
-        },
-    }[themeVersion][themeMode];
+    }[themeMode];
 
     React.useEffect(() => {
         const restoreState = async () => {
@@ -273,21 +267,24 @@ export default function Menu() {
         savePrefs();
     }, [themeMode]);
 
-    const preferences = React.useMemo(
-        () => ({
-            toggleTheme: () => setIsDarkMode((oldValue) => !oldValue),
-            toggleCollapsed: () => setCollapsed(!collapsed),
-            toggleThemeVersion: () =>
-                setThemeVersion((oldThemeVersion) => (oldThemeVersion === 2 ? 3 : 2)),
-            collapsed,
-            theme,
-        }),
-        [theme, collapsed]
-    );
-
-    if (!isReady) {
-        return null;
-    }
+    React.useEffect(() => {
+        const restoreState = async () => {
+          try {
+            const savedStateString = await AsyncStorage.getItem(PERSISTENCE_KEY);
+            const state = JSON.parse(savedStateString || '');
+    
+            setInitialState(state);
+          } catch (e) {
+            // ignore error
+          } finally {
+            setIsReady(true);
+          }
+        };
+    
+        if (!isReady) {
+          restoreState();
+        }
+      }, [isReady]);
 
     const { LightTheme, DarkTheme } = adaptNavigationTheme({
         reactNavigationLight: NavigationDefaultTheme,
@@ -316,8 +313,11 @@ export default function Menu() {
 
     return (
 
-        <NavigationContainer theme={combinedTheme} >
+        <NavigationContainer initialState={initialState} onStateChange={(state)=>{
+            AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
+        }} theme={combinedTheme} >
             <Drawer.Navigator initialRouteName="Home"
+            
                 screenOptions={{
                     drawerType: "slide",
                     overlayColor: "transparent",
@@ -353,6 +353,7 @@ const styles = StyleSheet.create({
     },
     userInfoSection: {
         paddingLeft: 20,
+        paddingBottom:20,
     },
     title: {
         marginTop: 20,
