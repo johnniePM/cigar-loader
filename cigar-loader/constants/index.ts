@@ -5,9 +5,9 @@ import {
     IHumidor,
     ILibrary,
     QRcode64,
-    ISettings
+    ISettings,
 } from "./data"
-import { IUseDatabase } from "./Components"
+import { IUseDatabase, ICounterComponent, IDetailComponent,IAutoComplete } from "./Components"
 
 
 
@@ -19,6 +19,9 @@ export {
     ILibrary,
     QRcode64,
     IUseDatabase,
-    ISettings
+    ISettings,
+    ICounterComponent,
+    IDetailComponent,
+    IAutoComplete
 
 }

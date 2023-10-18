@@ -31,10 +31,10 @@ export default function ScreenWrapper({
     styles.container,
     {
       backgroundColor: theme.colors.background,
-      paddingBottom: insets.bottom,
-      paddingLeft: insets.left+10,
-      paddingRight: insets.right+10,
-      paddingTop: 10,
+      marginBottom: insets.bottom,
+      marginLeft: insets.left+16,
+      marginRight: insets.right+16,
+      marginTop: 10,
     },
   ];
 
@@ -43,10 +43,10 @@ export default function ScreenWrapper({
       {withScrollView ? (
         <ScrollView
           {...rest}
-          contentContainerStyle={contentContainerStyle}
+          contentContainerStyle={[contentContainerStyle,{overflow:"visible"}]}
           alwaysBounceVertical={false}
           showsVerticalScrollIndicator={false}
-          style={[containerStyle, style]}
+          style={[containerStyle, style,{overflow:"visible"}]}
         >
           {children}
         </ScrollView>

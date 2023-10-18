@@ -10,6 +10,7 @@ import History from '../screens/History';
 import Library from '../screens/Library';
 import AddCigar from '../screens/AddCigar';
 import Settings from '../screens/Settings';
+import AddHumidor from '../screens/AddHumidor';
 
 export type RootStackParamList = {
   Home:any;
@@ -17,7 +18,8 @@ export type RootStackParamList = {
   AddCigar:any;
   History:any;
   Library:any;
-  Settings:any
+  Settings:any;
+  AddHumidor:any;
 };
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -62,6 +64,12 @@ export default () => {
         name="Settings"
         component={Settings}
         options={{  }}
+        // options={{title: 'Hem',}}
+      />
+      <Stack.Screen
+        name="AddHumidor"
+        component={AddHumidor}
+        options={{ headerShown:false }}
         // options={{title: 'Hem',}}
       />
     
