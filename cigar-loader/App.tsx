@@ -7,8 +7,6 @@ import Main from './Main';
 export default function App() {
   const theme = useColorScheme()
   const appe = Appearance
-  console.log(theme)
-  console.log(appe.getColorScheme())
   return (
     <DatabaseProvider>
       <StatusBar style="auto" backgroundColor='#00000000' translucent={false}  />

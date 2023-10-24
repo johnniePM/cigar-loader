@@ -40,6 +40,7 @@ import { useDrawerStatus } from "@react-navigation/drawer";
 import { Button, Text } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
+import { DataProvider } from '../hooks/UseData';
 
 /* drawer menu screens navigation */
 const ScreensStack = () => {
@@ -74,9 +75,7 @@ const ScreensStack = () => {
             useNativeDriver: true,
             toValue: isDrawerOpen ? 1 : 0,
         }).start();
-        console.log("isDrawerOpen start");
-        console.log(isDrawerOpen);
-        console.log("isDrawerOpen end");
+  
     }, [isDrawerOpen, animation]);
 
     return (
@@ -312,7 +311,7 @@ export default function Menu() {
     const combinedTheme = isDarkMode ? CombinedDarkTheme : CombinedDefaultTheme;
 
     return (
-
+        <DataProvider>
         <NavigationContainer initialState={initialState} onStateChange={(state)=>{
             AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
         }} theme={combinedTheme} >
@@ -343,6 +342,7 @@ export default function Menu() {
             <StatusBar style={!theme.isV3 || theme.dark ? 'light' : 'dark'} />
 
         </NavigationContainer>
+        </DataProvider>
     );
 }
 

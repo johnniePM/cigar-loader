@@ -4,8 +4,8 @@ import {
     IHistory,
     IHumidor,
     ILibrary,
-    QRcode64,
     ISettings,
+    RingType
 } from "./data"
 import { IUseDatabase, ICounterComponent, IDetailComponent,IAutoComplete } from "./Components"
 
@@ -17,7 +17,7 @@ export {
     IHistory,
     IHumidor,
     ILibrary,
-    QRcode64,
+    RingType,
     IUseDatabase,
     ISettings,
     ICounterComponent,

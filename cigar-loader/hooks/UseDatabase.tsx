@@ -37,7 +37,8 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
 
   const add_to_brand = useCallback((brand: IBrand) => {
     db.transactionAsync(async (exc) => {
-      exc.executeSqlAsync(MDATABASE.AddBrandTable(brand)).then(() => {
+      exc.executeSqlAsync(MDATABASE.AddBrandTable(brand)).then((e) => {
+        console.log(e)
       })
     }).then(() => {
       // var arr=[]
@@ -97,7 +98,7 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
   const edit_table = useCallback((table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number, update: IUpdate) => {
     db.transactionAsync(async (exc) => {
       exc.executeSqlAsync(MDATABASE.EditTable(table, id, update)).then((val) => {
-      }).catch((e)=>{console.log("dsadas"); console.log(e)})
+      }).catch((e)=>{console.log("catch edit table"); console.log(e)})
     }).then(() => {
     }, (reason) => {
     })
@@ -116,12 +117,17 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
   const select_from_table = useCallback((table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",setState?:React.Dispatch<React.SetStateAction<any>>, value?: string, the_key: keyof IUpdate = "id" ) => {
      db.transactionAsync(async (exc) => {
        exc.executeSqlAsync(value != undefined ? MDATABASE.SelectFromTable(table, the_key, value) : MDATABASE.SelectFromTable(table)).then((val) => {
+        //  console.log(val)
           if (isResultSet(val)) {
+            // console.log(val)
             if(setState!=undefined){
-
+              // console.log(val)
               setState(val["rows"])
+
             }
           } else {
+
+            
           }
         
       })

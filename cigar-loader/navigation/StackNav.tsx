@@ -44,7 +44,7 @@ export default () => {
       <Stack.Screen
         name="AddCigar"
         component={AddCigar}
-        // options={{title: 'Hem',}}
+        options={{headerShown: false,}}
       />
       
       <Stack.Screen

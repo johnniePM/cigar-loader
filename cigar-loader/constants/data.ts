@@ -1,7 +1,6 @@
 
-type RingType= `${number} cm`|`${number} mm`
+export type RingType= `${number} cm`|`${number} mm`
 
-export type QRcode64 = { length: 64 } & string;
 
 export interface IBrand{
     id?:number;
@@ -26,10 +25,11 @@ export interface ICigar{
 
 export interface ILibrary {
     id?:number;
-    qrCode:QRcode64;
+    qrCode:string;
     cigar:ICigar;
     total_number:number;
     price:number;
+    date_added:Date;
     humidor:IHumidor;
 }
 

@@ -8,8 +8,6 @@ import { SettingsProvider } from './hooks/UseSettings';
 
 export default function Main() {
     const theme=useTheme()
-    // console.log(theme.mode="exact")
-    console.log(theme.dark)
     return (
         <PaperProvider>
             <SettingsProvider>

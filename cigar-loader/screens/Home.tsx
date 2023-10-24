@@ -1,17 +1,20 @@
 import { GestureResponderEvent, LayoutAnimation, StyleSheet, View, ScrollView, Dimensions } from "react-native";
 import { Avatar, Button, Card, Divider, Drawer, FAB, List, Menu, Portal, Text, useTheme } from "react-native-paper";
 import ScreenWrapper from "../components/ScreenWrapper";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSettings } from "../hooks/UseSettings";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CoffeeCard from "../components/Card";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/StackNav";
+import { UseDatabase } from "../hooks/UseDatabase";
+import { IBrand, IHumidor } from "../constants";
+import { UseData } from "../hooks/UseData";
 type ContextualMenuCoord = { x: number; y: number };
 
 const SCREENWIDTH = Dimensions.get("window").width;
-const ELEMENTWIDTH = SCREENWIDTH - 32-32 ;
+const ELEMENTWIDTH = SCREENWIDTH - 32 - 32;
 const SPACING = (SCREENWIDTH - ELEMENTWIDTH) / 2;
 export default function Home() {
     const [visible, setVisible] = useState<boolean>(false);
@@ -19,7 +22,7 @@ export default function Home() {
     const [contextualMenuCoord, setContextualMenuCoor] = useState<ContextualMenuCoord>({ x: 0, y: 0 })
     const [open, setOpen] = useState<boolean>(false);
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-
+    const database = UseDatabase()
     const settings = useSettings()
     const openMenu = () => setVisible(true);
 
@@ -37,48 +40,57 @@ export default function Home() {
         });
         setVisible(true);
     };
-    console.log(open)
     const theme = useTheme()
+    const data=UseData()
+    useEffect(() => {
+        database.select_from_table("Humidor", data.handleHumidorList)
+        // database.add_to_brand({name:"Cohiba", origin:"Haha"})
+
+        database.select_from_table("Cigar", data.handleCigarList)
+
+    }, [])
+
+
     return (
-        <View style={{ height: "100%",width:"100%",overflow:"visible" }}>
+        <View style={{ height: "100%", width: "100%", overflow: "visible" }}>
             <ScreenWrapper >
                 <ScrollView
                     pagingEnabled
                     horizontal
-                    style={{  width:SCREENWIDTH, overflow:"visible" }}
-                    contentContainerStyle={{ overflow:"visible" }}
+                    style={{ width: SCREENWIDTH, overflow: "visible" }}
+                    contentContainerStyle={{ overflow: "visible" }}
                     showsHorizontalScrollIndicator={false}
                     snapToInterval={ELEMENTWIDTH + SPACING / 3}
 
                 >
 
-                    {[1,2,3,4,5,6].map((value,index)=>{
-                        return(
-                    <Card onPress={() => { }} style={{ marginBottom: 10, overflow: "visible", marginTop: 100, width: ELEMENTWIDTH, borderRadius: 60, marginLeft:index != 0 ? SPACING / 3 : SPACING-16 }} mode="contained">
-                        <Card.Cover imageStyle={{ marginTop: -100 }}   resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
-                        <Card.Title
+                    {data.HumidorList?.map((value, index) => {
+                        return (
+                            <Card onPress={() => { }} style={{ marginBottom: 10, overflow: "visible", marginTop: 100, width: ELEMENTWIDTH, borderRadius: 60, marginLeft: index != 0 ? SPACING / 3 : SPACING - 16 }} mode="contained">
+                                <Card.Cover imageStyle={{ marginTop: -100 }} resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
+                                <Card.Title
 
-                            title="Living Room Humidor"
-                            titleVariant="headlineSmall"
-                        />
-                        <Card.Content>
-                            <List.Item
+                                    title={value.name}
+                                    titleVariant="headlineSmall"
+                                />
+                                <Card.Content>
+                                    <List.Item
 
-                                title="Cigars in humider"
-                                description={"22/100"}
-                                left={(props) => <List.Icon {...props} icon="cigar" />}
-                            />
-                        </Card.Content>
+                                        title="Cigars in humider"
+                                        description={"22/"+value.total_capacity}
+                                        left={(props) => <List.Icon {...props} icon="cigar" />}
+                                    />
+                                </Card.Content>
 
-                    </Card>
+                            </Card>
 
                         )
                     })}
 
-              <View style={{ width: SPACING }} />
+                    <View style={{ width: SPACING }} />
 
                 </ScrollView>
-             
+
                 {settings.ShowQuickStats &&
                     <Card mode="contained" style={{ marginBottom: 20 }} onPress={() => handleExpanded()}>
                         <Card.Title
@@ -163,7 +175,7 @@ export default function Home() {
                 actions={[
 
                     { icon: 'cigar', label: 'Add new cigar', onPress: () => { } },
-                    { icon: 'dresser-outline', label: 'Add New Humidor', onPress: () => {navigation.navigate("AddHumidor"); console.log("hahahahahah") } },
+                    { icon: 'dresser-outline', label: 'Add New Humidor', onPress: () => { navigation.navigate("AddHumidor"); console.log("hahahahahah") } },
                     {
                         icon: 'content-save-edit',
                         label: 'Report Smoking a Cigar',
@@ -177,9 +189,8 @@ export default function Home() {
                     if (!open) {
                         var item = theme.colors.elevation.level2
                         if (typeof item == "string") {
-
+                            navigation.navigate("AddCigar")
                         }
-                        console.log(item)
                         // console.log(item)
                     }
                 }}

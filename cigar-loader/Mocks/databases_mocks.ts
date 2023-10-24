@@ -31,6 +31,7 @@ export const CreateLibraryTable = `CREATE TABLE IF NOT EXISTS Library (
     cigar_id INTEGER NOT NULL,
     total_number INTEGER NOT NULL,
     price REAL NOT NULL,
+    date_added DATETIME NOT NULL,
     humidor_id INTEGER NOT NULL,
     FOREIGN KEY (cigar_id) REFERENCES Cigar (id),
     FOREIGN KEY (humidor_id) REFERENCES Humidor (id)
@@ -56,20 +57,20 @@ VALUES ('${brand.name}', '${brand.origin}');`
 
 
 export const AddHumidorTable = (humidor: IHumidor) => {
-    return `(name, total_capacity)
+    return `INSERT INTO Humidor(name, total_capacity)
 VALUES ('${humidor.name}', '${humidor.total_capacity}');`
 }
 
 
 export const AddCigarTable = (cigar: ICigar) => {
-    return `(name, brand_id, length, smoking_time, ring)
+    return `INSERT INTO Cigar(name, brand_id, length, smoking_time, ring)
 VALUES ('${cigar.name}', '${cigar.brand.id}' , '${cigar.length}' , '${cigar.smoking_time}' , '${cigar.ring}');`
 }
 
 
 export const AddLibraryTable = (library: ILibrary) => {
-    return `Library (qrCode, cigar_id, total_number, price, humidor_id)
-VALUES ('${library.qrCode}', '${library.cigar.id}' , '${library.total_number}' , '${library.price}' , '${library.humidor.id}');`
+    return `INSERT INTO Library (qrCode, cigar_id, total_number, price, humidor_id, date_added)
+VALUES ('${library.qrCode}', '${library.cigar.id}' , '${library.total_number}' , '${library.price}' , '${library.humidor.id}' , '${library.date_added}');`
 }
 
 
