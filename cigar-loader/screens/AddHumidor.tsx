@@ -9,7 +9,6 @@ import Autocomplete from '../components/AutoComplete';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import DetailsComponent from '../components/DetailsComponent';
 import { UseDatabase } from '../hooks/UseDatabase';
-import { UseData } from '../hooks/UseData';
 const { width, height } = Dimensions.get('window');
 const ios = Platform.OS == 'ios';
 
@@ -18,7 +17,6 @@ export default function AddHumidor(props: any) {
   const [totalNumber, setTotalNumber] = useState<number>(0)
   const [name, setName] = useState<string>("")
   const database=UseDatabase()
-  const data=UseData()
   const navigation = useNavigation();
 
   const handle_add=()=>{
@@ -26,8 +24,8 @@ export default function AddHumidor(props: any) {
     database.add_to_humidor({"name":name,total_capacity:String(totalNumber)})
     console.log("dsadsadsadsasad2")
     setTimeout(() => {
-      database.select_from_table("Humidor", data.handleHumidorList)
-      database.select_from_table("Library", data.handleLibraryList)
+      database.select_from_table("Humidor", database.handleHumidorList)
+      database.select_from_table("Library", database.handleLibraryList)
 
       navigation.goBack()
     }, 500);

@@ -35,8 +35,10 @@ const Autocomplete = ({
     );
   };
   React.useEffect(()=>{
-
-  },[value])
+    console.log("data")
+    console.log(data)
+    console.log("data")
+    },[])
   return (
     <View style={[containerStyle]}>
       <TextInput
@@ -69,7 +71,7 @@ const Autocomplete = ({
         }}
         value={value}
       />
-      {menuVisible  && (
+      {menuVisible  && filteredData.length>0&& (
         <BlurView
 
           style={{

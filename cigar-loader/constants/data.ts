@@ -43,6 +43,47 @@ export interface IHistory {
     self_used:boolean
 }
 
+export interface DbBrand{
+    id?:number;
+    name:string;
+    origin:string
+}
+export interface DbHumidor{
+    id?:number;
+    name:string;
+    total_capacity:string
+}
+
+
+export interface DbCigar{
+    brand_id:number;
+    id: number;
+    length: number;
+    name: string;
+    ring: RingType;
+    smoking_time: number
+}
+
+export interface DbLibrary {
+    cigar_id: number;
+    date_added: Date;
+    humidor_id: number;
+    id: number;
+    price: number;
+    qrCode: string;
+    total_number: number
+}
+
+export interface DbHistory {
+    id?:number;
+    cigar:ICigar;
+    date_added:Date;
+    date_used:Date;
+    rate:string;
+    comment:string;
+    self_used:boolean
+}
+
 
 export interface IStorageSettings{
     QuickAdd:"Smoked Cigar"|"Add Cigar"|"Add Humidor";
@@ -74,5 +115,6 @@ export interface ISettings extends IStorageSettings{
 export interface IUpdate extends Partial<IHistory> , Partial<ILibrary> , Partial<ICigar> , Partial<IHumidor> , Partial<IBrand>{
     
 }
-
+export interface DbUpdate extends Partial<DbHistory> , Partial<DbLibrary> , Partial<DbCigar> , Partial<DbHumidor> , Partial<DbBrand>{
+}
 

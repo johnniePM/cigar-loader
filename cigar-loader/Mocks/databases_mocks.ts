@@ -1,4 +1,4 @@
-import { IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "../constants/data"
+import { DbBrand, DbCigar, DbHumidor, DbLibrary, DbUpdate, IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "../constants/data"
 
 export const CreateBrandTable = `CREATE TABLE IF NOT EXISTS Brand (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,27 +50,27 @@ export const CreateHistoryTable = `CREATE TABLE IF NOT EXISTS History (
 );`
 
 
-export const AddBrandTable = (brand: IBrand) => {
+export const AddBrandTable = (brand: DbBrand) => {
     return `INSERT INTO Brand (name, origin)
 VALUES ('${brand.name}', '${brand.origin}');`
 }
 
 
-export const AddHumidorTable = (humidor: IHumidor) => {
+export const AddHumidorTable = (humidor: DbHumidor) => {
     return `INSERT INTO Humidor(name, total_capacity)
 VALUES ('${humidor.name}', '${humidor.total_capacity}');`
 }
 
 
-export const AddCigarTable = (cigar: ICigar) => {
+export const AddCigarTable = (cigar: DbCigar) => {
     return `INSERT INTO Cigar(name, brand_id, length, smoking_time, ring)
-VALUES ('${cigar.name}', '${cigar.brand.id}' , '${cigar.length}' , '${cigar.smoking_time}' , '${cigar.ring}');`
+VALUES ('${cigar.name}', '${cigar.brand_id}' , '${cigar.length}' , '${cigar.smoking_time}' , '${cigar.ring}');`
 }
 
 
-export const AddLibraryTable = (library: ILibrary) => {
+export const AddLibraryTable = (library: DbLibrary) => {
     return `INSERT INTO Library (qrCode, cigar_id, total_number, price, humidor_id, date_added)
-VALUES ('${library.qrCode}', '${library.cigar.id}' , '${library.total_number}' , '${library.price}' , '${library.humidor.id}' , '${library.date_added}');`
+VALUES ('${library.qrCode}', '${library.cigar_id}' , '${library.total_number}' , '${library.price}' , '${library.humidor_id}' , '${library.date_added}');`
 }
 
 
@@ -80,13 +80,13 @@ VALUES ('${History.cigar.id}', '${History.date_added}' , '${History.date_used}' 
 }
 
 
-export const EditTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number, update: IUpdate) => {
+export const EditTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number, update: DbUpdate) => {
     const last_index = Object.keys(update).length - 1
     var the_string: string = ""
 
     Object.keys(update).map((i, e) => {
         const rest = e < last_index ? " , " : " "
-        the_string += String(i) + " = " + "'"+ update[i as keyof IUpdate]+"'" + rest
+        the_string += String(i) + " = " + "'"+ update[i as keyof DbUpdate]+"'" + rest
     })
 
     return (`UPDATE ${table} SET ${the_string} WHERE id = ${id}`)
@@ -98,7 +98,7 @@ export const DeleteFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library"
     return (`DELETE FROM ${table} WHERE id = ${id};`)
 }
 
-export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",  the_key: keyof IUpdate = "id", value?: string,) => {
+export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",  the_key: keyof DbUpdate = "id", value?: string|number,) => {
     if (value!=undefined){
         return (`SELECT * FROM ${table} WHERE ${the_key} = ${value};`)
     }else{

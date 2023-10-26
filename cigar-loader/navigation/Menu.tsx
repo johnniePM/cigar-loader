@@ -1,5 +1,5 @@
 import { DrawerContentScrollView, createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, Theme } from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/core";
 import {
     InitialState,
@@ -40,7 +40,6 @@ import { useDrawerStatus } from "@react-navigation/drawer";
 import { Button, Text } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
-import { DataProvider } from '../hooks/UseData';
 
 /* drawer menu screens navigation */
 const ScreensStack = () => {
@@ -98,7 +97,7 @@ const ScreensStack = () => {
 };
 
 
-const DrawerContent = (props) => {
+const DrawerContent = (props:any) => {
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const [active, setActive] = useState<"History" | "Home"|"Settings">("Home")
 
@@ -110,18 +109,9 @@ const DrawerContent = (props) => {
         [navigation, setActive]
 
     );
-    const { colors, isV3 } = useTheme();
+    const { colors } = useTheme();
 
-    const coloredLabelTheme = {
-        colors: isV3
-            ? {
-                secondaryContainer: MD3Colors.tertiary80,
-                onSecondaryContainer: MD3Colors.tertiary20,
-            }
-            : {
-                primary: MD2Colors.tealA200,
-            },
-    };
+ 
 
 
 
@@ -203,7 +193,7 @@ export default function Menu() {
     const [collapsed, setCollapsed] = React.useState(false);
 
     const themeMode = isDarkMode ? 'dark' : 'light';
-
+    const the_theme=useTheme()
     const theme = {
 
             light: MD3LightTheme,
@@ -291,27 +281,24 @@ export default function Menu() {
     });
 
     const CombinedDefaultTheme = {
-        ...MD3LightTheme,
-        ...LightTheme,
-        colors: {
-            ...MD3LightTheme.colors,
-            ...LightTheme.colors,
-        },
+        // ...LightTheme,
+        ...the_theme as unknown as Theme,
+        
     };
 
     const CombinedDarkTheme = {
-        ...MD3DarkTheme,
         ...DarkTheme,
+        ...MD3DarkTheme,
         colors: {
-            ...MD3DarkTheme.colors,
             ...DarkTheme.colors,
+            ...the_theme.colors,
         },
     };
 
     const combinedTheme = isDarkMode ? CombinedDarkTheme : CombinedDefaultTheme;
+    
 
     return (
-        <DataProvider>
         <NavigationContainer initialState={initialState} onStateChange={(state)=>{
             AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
         }} theme={combinedTheme} >
@@ -342,7 +329,6 @@ export default function Menu() {
             <StatusBar style={!theme.isV3 || theme.dark ? 'light' : 'dark'} />
 
         </NavigationContainer>
-        </DataProvider>
     );
 }
 

@@ -10,7 +10,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/StackNav";
 import { UseDatabase } from "../hooks/UseDatabase";
 import { IBrand, IHumidor } from "../constants";
-import { UseData } from "../hooks/UseData";
 type ContextualMenuCoord = { x: number; y: number };
 
 const SCREENWIDTH = Dimensions.get("window").width;
@@ -23,6 +22,7 @@ export default function Home() {
     const [open, setOpen] = useState<boolean>(false);
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const database = UseDatabase()
+    const [brand, setBrand]=useState<Array<IBrand>>([])
     const settings = useSettings()
     const openMenu = () => setVisible(true);
 
@@ -41,13 +41,11 @@ export default function Home() {
         setVisible(true);
     };
     const theme = useTheme()
-    const data=UseData()
     useEffect(() => {
-        database.select_from_table("Humidor", data.handleHumidorList)
-        // database.add_to_brand({name:"Cohiba", origin:"Haha"})
-
-        database.select_from_table("Cigar", data.handleCigarList)
-
+        database.select_from_table("Brand", setBrand)
+        database.select_from_table("Library", database.handleLibraryList)
+        database.select_from_table("Cigar", database.handleCigarList)
+        database.select_from_table("Humidor", database.handleHumidorList)
     }, [])
 
 
@@ -64,10 +62,10 @@ export default function Home() {
 
                 >
 
-                    {data.HumidorList?.map((value, index) => {
+                    {database.HumidorList?.map((value, index) => {
                         return (
                             <Card onPress={() => { }} style={{ marginBottom: 10, overflow: "visible", marginTop: 100, width: ELEMENTWIDTH, borderRadius: 60, marginLeft: index != 0 ? SPACING / 3 : SPACING - 16 }} mode="contained">
-                                <Card.Cover imageStyle={{ marginTop: -100 }} resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
+                                <Card.Cover   resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
                                 <Card.Title
 
                                     title={value.name}

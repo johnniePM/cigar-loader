@@ -5,6 +5,12 @@ import {
     IHumidor,
     ILibrary,
     ISettings,
+    DbBrand,
+    DbCigar,
+    DbHistory,
+    DbHumidor,
+    DbLibrary,
+    DbUpdate,
     RingType
 } from "./data"
 import { IUseDatabase, ICounterComponent, IDetailComponent,IAutoComplete } from "./Components"
@@ -17,11 +23,17 @@ export {
     IHistory,
     IHumidor,
     ILibrary,
+    DbBrand,
+    DbCigar,
+    DbHistory,
+    DbHumidor,
+    DbLibrary,
     RingType,
     IUseDatabase,
     ISettings,
     ICounterComponent,
     IDetailComponent,
-    IAutoComplete
+    IAutoComplete,
+    DbUpdate
 
 }
