@@ -98,8 +98,20 @@ export const DeleteFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library"
     return (`DELETE FROM ${table} WHERE id = ${id};`)
 }
 
-export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",  the_key: keyof DbUpdate = "id", value?: string|number,) => {
+export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",  the_key: keyof DbUpdate = "id", value?: string|number|Array<string|number>,) => {
     if (value!=undefined){
+        if (Array.isArray(value)){
+            var the_string=""
+            let array_index=value.length-1
+            value.map((v, e)=>{
+                // console.log(e)
+                // console.log(array_index)
+                e < array_index 
+                ? the_string+= String(the_key) + " = " + String(v) + " OR "
+                : the_string+= String(the_key) + " = " + String(v) 
+            }) 
+            return (`SELECT * FROM ${table} WHERE ${the_string};`) 
+        }
         return (`SELECT * FROM ${table} WHERE ${the_key} = ${value};`)
     }else{
         return (`SELECT * FROM ${table};`)

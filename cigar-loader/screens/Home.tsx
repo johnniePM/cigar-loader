@@ -1,5 +1,5 @@
 import { GestureResponderEvent, LayoutAnimation, StyleSheet, View, ScrollView, Dimensions } from "react-native";
-import { Avatar, Button, Card, Divider, Drawer, FAB, List, Menu, Portal, Text, useTheme } from "react-native-paper";
+import { Avatar, Button, Card, Chip, Divider, Drawer, FAB, List, Menu, Portal, Searchbar, Surface, Text, useTheme } from "react-native-paper";
 import ScreenWrapper from "../components/ScreenWrapper";
 import { useCallback, useEffect, useState } from "react";
 import { useSettings } from "../hooks/UseSettings";
@@ -9,24 +9,26 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/StackNav";
 import { UseDatabase } from "../hooks/UseDatabase";
-import { IBrand, IHumidor } from "../constants";
+import { DbBrand, DbHumidor, DbLibrary, IBrand, IHumidor } from "../constants";
+import { SelectFromTable } from "../Mocks/databases_mocks";
 type ContextualMenuCoord = { x: number; y: number };
 
 const SCREENWIDTH = Dimensions.get("window").width;
+const SCREENHEIGHT = Dimensions.get("window").height;
 const ELEMENTWIDTH = SCREENWIDTH - 32 - 32;
 const SPACING = (SCREENWIDTH - ELEMENTWIDTH) / 2;
 export default function Home() {
     const [visible, setVisible] = useState<boolean>(false);
     const [expanded, setExpanded] = useState<boolean>(false);
-    const [contextualMenuCoord, setContextualMenuCoor] = useState<ContextualMenuCoord>({ x: 0, y: 0 })
+    const [firstQuery, setFirstQuery] = useState<string>("");
     const [open, setOpen] = useState<boolean>(false);
+    const [brand, setBrand] = useState<Array<DbBrand>>([])
+    const [humidor, setHumidor] = useState<Array<DbHumidor>>([])
+    const [library, setLibrary] = useState<Array<DbLibrary>>([])
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const database = UseDatabase()
-    const [brand, setBrand]=useState<Array<IBrand>>([])
     const settings = useSettings()
-    const openMenu = () => setVisible(true);
 
-    const closeMenu = () => setVisible(false);
     const handleExpanded = () => {
         const LAYOUT = LayoutAnimation.create(300, "easeInEaseOut", "opacity");
         LayoutAnimation.configureNext(LAYOUT)
@@ -34,24 +36,55 @@ export default function Home() {
     }
     const _handleLongPress = (event: GestureResponderEvent) => {
         const { nativeEvent } = event;
-        setContextualMenuCoor({
-            x: nativeEvent.pageX,
-            y: nativeEvent.pageY,
-        });
+
         setVisible(true);
     };
     const theme = useTheme()
+    async function hello() {
+        await database.select_from_table("Humidor", setHumidor).then(()=>{
+            console.log("humidor")
+            console.log(humidor)
+            console.log("humidor")
+        })
+    }
     useEffect(() => {
-        database.select_from_table("Brand", setBrand)
-        database.select_from_table("Library", database.handleLibraryList)
-        database.select_from_table("Cigar", database.handleCigarList)
-        database.select_from_table("Humidor", database.handleHumidorList)
+        // database.select_from_table("Brand", setBrand)
+        // database.select_from_table("Library", database.handleLibraryList)
+        // database.select_from_table("Cigar", database.handleCigarList)
+        // database.select_from_table("Humidor", database.handleHumidorList)
+        console.log(SelectFromTable("Library", "id", ["dfs", "rewrew",31321, 432, "432432dsa"]))
+
+        console.log(SelectFromTable("Library", "id", "3232"))
+        console.log(hello())
+        
+
     }, [])
 
 
     return (
         <View style={{ height: "100%", width: "100%", overflow: "visible" }}>
             <ScreenWrapper >
+                <Searchbar
+                    placeholder="Search"
+                    onChangeText={(query: string) => setFirstQuery(query)}
+                    value={firstQuery}
+                    style={{marginVertical:10,marginHorizontal:25, marginBottom:20 }}
+                />
+                <ScrollView horizontal style={{paddingHorizontal:25, marginBottom:20}} showsHorizontalScrollIndicator={false}>
+                    <Surface elevation={0} style={{ flexDirection: "row", columnGap: 20, rowGap: 20, marginBottom: 10 }} >
+                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}} selected ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
+                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}}  ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
+                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}}  ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
+                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}}  ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
+                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}}  ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
+                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}}  ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
+                        
+                        
+                        
+                        
+                    </Surface>
+                </ScrollView>
+                
                 <ScrollView
                     pagingEnabled
                     horizontal
@@ -64,8 +97,9 @@ export default function Home() {
 
                     {database.HumidorList?.map((value, index) => {
                         return (
-                            <Card onPress={() => { }} style={{ marginBottom: 10, overflow: "visible", marginTop: 100, width: ELEMENTWIDTH, borderRadius: 60, marginLeft: index != 0 ? SPACING / 3 : SPACING - 16 }} mode="contained">
-                                <Card.Cover   resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
+                            <>
+                            <Card onPress={() => { }} style={{ marginBottom: 10, overflow: "visible", width: ELEMENTWIDTH, borderRadius: 60, marginLeft: index != 0 ? SPACING / 3 : SPACING - 16 }} mode="contained">
+                                <Card.Cover resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
                                 <Card.Title
 
                                     title={value.name}
@@ -75,13 +109,47 @@ export default function Home() {
                                     <List.Item
 
                                         title="Cigars in humider"
-                                        description={"22/"+value.total_capacity}
+                                        description={"22/" + value.total_capacity}
                                         left={(props) => <List.Icon {...props} icon="cigar" />}
                                     />
                                 </Card.Content>
 
                             </Card>
+                            <Card onPress={() => { }} style={{ marginBottom: 10, overflow: "visible", width: ELEMENTWIDTH, borderRadius: 60, marginLeft: index != 0 ? SPACING / 3 : SPACING - 16 }} mode="contained">
+                                <Card.Cover resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
+                                <Card.Title
 
+                                    title={value.name}
+                                    titleVariant="headlineSmall"
+                                />
+                                <Card.Content>
+                                    <List.Item
+
+                                        title="Cigars in humider"
+                                        description={"22/" + value.total_capacity}
+                                        left={(props) => <List.Icon {...props} icon="cigar" />}
+                                    />
+                                </Card.Content>
+
+                            </Card>
+                            <Card onPress={() => { }} style={{ marginBottom: 10, overflow: "visible", width: ELEMENTWIDTH, borderRadius: 60, marginLeft: index != 0 ? SPACING / 3 : SPACING - 16 }} mode="contained">
+                                <Card.Cover resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
+                                <Card.Title
+
+                                    title={value.name}
+                                    titleVariant="headlineSmall"
+                                />
+                                <Card.Content>
+                                    <List.Item
+
+                                        title="Cigars in humider"
+                                        description={"22/" + value.total_capacity}
+                                        left={(props) => <List.Icon {...props} icon="cigar" />}
+                                    />
+                                </Card.Content>
+
+                            </Card>
+                            </>
                         )
                     })}
 

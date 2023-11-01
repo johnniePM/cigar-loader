@@ -1,4 +1,4 @@
-import { DbCigar, DbLibrary, IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "./data";
+import { DbBrand, DbCigar, DbHistory, DbHumidor, DbLibrary, IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "./data";
 import { ImageSourcePropType } from 'react-native'
 import { ViewStyle, StyleProp, TextStyle, } from "react-native";
 
@@ -11,9 +11,10 @@ export interface IUseDatabase {
     add_to_library: (library?: DbLibrary) => Promise<number|undefined>;
     edit_table: (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number, update: IUpdate) => void;
     delete_from_table: (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number) => void;
-    select_from_table: (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", setState?: React.Dispatch<React.SetStateAction<any>>, value?: string, the_key?: keyof IUpdate) => void;
+    select_from_table: (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", setState?: React.Dispatch<React.SetStateAction<any>>, value?: string, the_key?: keyof IUpdate) => Promise<any>;
+    async_select_from_table: (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",  value?: string, the_key?: keyof IUpdate) => Promise< Array<DbBrand> | Array<DbHumidor> | Array<DbCigar> | Array<DbLibrary> | Array<DbHistory>>;
     HumidorList:Array<IHumidor>;
-    LibraryList:Array<IHumidor>;
+    LibraryList:Array<ILibrary>;
     selectedHumidor:IHumidor;
     selectedLibrary:IHumidor;
     CigarList:Array<ICigar>;

@@ -19,39 +19,61 @@ function isResultSet(object: any): object is SQLite.SQLResultSet {
   return 'rows' in object;
 }
 
-function checkIsLibrary(object: Array<any>): object is DbLibrary[] {
-  var isit:boolean=true
-  object.map((v)=>{
-    if("cigar_id" in v ||
-      "date_added" in v ||
-      "humidor_id" in v ||
-      "id" in v ||
-      "price" in v ||
-      "qrCode" in v ||
-      "total_number" in v 
+
+
+function checkIsType(object: Array<any>): object is Array<DbUpdate> {
+  var isit: boolean = true
+  object.map((v) => {
+    if ("cigar_id" in v &&
+      "date_added" in v &&
+      "humidor_id" in v &&
+      "id" in v &&
+      "price" in v &&
+      "qrCode" in v &&
+      "qrCode" in v &&
+      "total_number" in v &&
+      "name" in v &&
+      "origin" in v && 
+      "name" in v &&
+      "total_capacity" in v && 
+      "brand_id" in v && 
+      "length" in v && 
+      "name" in v && 
+      "ring" in v && 
+      "smoking_time" in v && 
+      "cigar" in v && 
+      "date_added" in v && 
+      "date_used" in v && 
+      "rate" in v && 
+      "comment" in v && 
+      "self_used" in v 
+
+     
+     
       ){
-        
-      }
-    else{
-      isit= false
-    }
-  })
-  return isit
+
+  }
+    else {
+    isit = false
+  }
+})
+return isit
 }
+
 
 const db = openDatabase();
 
 export const DatabaseProvider = ({ children }: { children: React.ReactNode }) => {
-  const [HumidorList, handleHumidorList]=useState<Array<DbHumidor>>([])
-  const [LibraryList, handleLibraryList]=useState<Array<DbLibrary>>([])
-  const [CigarList, handleCigarList]=useState<Array<DbCigar>>([])
-  const [selectedHumidor, handleSelectedHumidor]=useState<DbHumidor>()
-  const [selectedLibrary, handleSelectedLibrary]=useState<DbLibrary>()
-
-  
+  const [HumidorList, handleHumidorList] = useState<Array<DbHumidor>>([])
+  const [LibraryList, handleLibraryList] = useState<Array<DbLibrary>>([])
+  const [CigarList, handleCigarList] = useState<Array<DbCigar>>([])
+  const [selectedHumidor, handleSelectedHumidor] = useState<DbHumidor>()
+  const [selectedLibrary, handleSelectedLibrary] = useState<DbLibrary>()
 
 
-  const create_tables =useCallback(()=> {
+
+
+  const create_tables = useCallback(() => {
     db.transactionAsync(async (exc) => {
       exc.executeSqlAsync(MDATABASE.CreateBrandTable);
       exc.executeSqlAsync(MDATABASE.CreateCigarTable);
@@ -63,41 +85,41 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
     })
   }, [])
 
-  const add_to_brand = useCallback(async(brand: IBrand):Promise<number> => {
+  const add_to_brand = useCallback(async (brand: IBrand): Promise<number> => {
     // console.log("haahahhaaaaaaaaaaa")
-    var id:number=NaN
-     await db.transactionAsync(async (exc) => {
+    var id: number = NaN
+    await db.transactionAsync(async (exc) => {
       await exc.executeSqlAsync(MDATABASE.AddBrandTable(brand)).then((g) => {
-        if (typeof g.insertId!="undefined"){
+        if (typeof g.insertId != "undefined") {
           console.log("type is not undefined")
-          id=g.insertId
+          id = g.insertId
         }
       })
     })
     return (id)
-    
+
   }, [])
 
-  const add_to_cigar = useCallback(async(cigar: DbCigar):Promise<number|undefined> => {
-    var id:number|undefined=undefined
+  const add_to_cigar = useCallback(async (cigar: DbCigar): Promise<number | undefined> => {
+    var id: number | undefined = undefined
 
     await db.transactionAsync(async (exc) => {
       await exc.executeSqlAsync(MDATABASE.AddCigarTable(cigar)).then((g) => {
-        if (typeof g.insertId!="undefined"){
-          id=g.insertId
+        if (typeof g.insertId != "undefined") {
+          id = g.insertId
 
         }
-      }).catch(e=>{console.log(e)})
+      }).catch(e => { console.log(e) })
     })
     return id
   }, [])
-  const add_to_humidor = useCallback( async(humidor: IHumidor):Promise<number|undefined> => {
-    var id:number|undefined=undefined
+  const add_to_humidor = useCallback(async (humidor: IHumidor): Promise<number | undefined> => {
+    var id: number | undefined = undefined
 
     await db.transactionAsync(async (exc) => {
       await exc.executeSqlAsync(MDATABASE.AddHumidorTable(humidor)).then((g) => {
-        if (typeof g.insertId!="undefined"){
-          id=g.insertId
+        if (typeof g.insertId != "undefined") {
+          id = g.insertId
         }
       })
     })
@@ -108,12 +130,12 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
 
 
 
-  const add_to_library = useCallback(async(library: DbLibrary):Promise<number|undefined> => {
-    var id:number|undefined=undefined
+  const add_to_library = useCallback(async (library: DbLibrary): Promise<number | undefined> => {
+    var id: number | undefined = undefined
     await db.transactionAsync(async (exc) => {
       await exc.executeSqlAsync(MDATABASE.AddLibraryTable(library)).then((g) => {
-        if (typeof g.insertId!="undefined"){
-          id=g.insertId
+        if (typeof g.insertId != "undefined") {
+          id = g.insertId
         }
       })
     })
@@ -121,13 +143,13 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
   }, [])
 
 
-  const add_to_history = useCallback(async(history: DbHistory):Promise<number|undefined> => {
-    var id:number|undefined=undefined
+  const add_to_history = useCallback(async (history: DbHistory): Promise<number | undefined> => {
+    var id: number | undefined = undefined
 
     db.transactionAsync(async (exc) => {
       await exc.executeSqlAsync(MDATABASE.AddHistoryTable(history)).then((g) => {
-        if (typeof g.insertId!="undefined"){
-          id=g.insertId
+        if (typeof g.insertId != "undefined") {
+          id = g.insertId
         }
       })
     })
@@ -138,39 +160,57 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
   const edit_table = useCallback((table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number, update: DbUpdate) => {
     db.transactionAsync(async (exc) => {
       exc.executeSqlAsync(MDATABASE.EditTable(table, id, update)).then((val) => {
-      }).catch((e)=>{})
+      }).catch((e) => { })
     }).then(() => {
     }, (reason) => {
     })
   }, [])
 
 
-  const delete_from_table = useCallback( (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number) => {
-    db.transactionAsync(async (exc) => {
-      exc.executeSqlAsync(MDATABASE.DeleteFromTable(table, id)).then(() => {
+  const delete_from_table = useCallback(async (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number) => {
+    await db.transactionAsync(async (exc) => {
+      await exc.executeSqlAsync(MDATABASE.DeleteFromTable(table, id)).then(() => {
       })
     }).then(() => {
     }, (reason) => {
     })
   }, [])
 
-  const select_from_table = useCallback((table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",setState?:React.Dispatch<React.SetStateAction<any>>, value?: string, the_key: keyof DbUpdate = "id" ) => {
-     db.transactionAsync(async (exc) => {
-       exc.executeSqlAsync(value != undefined ? MDATABASE.SelectFromTable(table, the_key, value) : MDATABASE.SelectFromTable(table)).then((val) => {
+  const select_from_table = useCallback(async (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", setState?: React.Dispatch<React.SetStateAction<any>>, value?: string | number | Array<string | number>, the_key: keyof DbUpdate = "id") => {
+    await db.transactionAsync(async (exc) => {
+      await exc.executeSqlAsync(value != undefined ? MDATABASE.SelectFromTable(table, the_key, value) : MDATABASE.SelectFromTable(table)).then((val) => {
         //  console.log(val)
-          if (isResultSet(val)) {
+        if (isResultSet(val)) {
+          // console.log(val)
+          if (setState != undefined) {
             // console.log(val)
-            if(setState!=undefined){
-              // console.log(val)
-              
-              setState(val["rows"])
-
-            }
-          } else {
-
             
+            setState(val["rows"])
+
           }
-        
+        } else {
+
+
+        }
+
+      })
+    })
+  }, [])
+  const async_select_from_table = useCallback(async (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", value?: string | number | Array<string | number>, the_key: keyof DbUpdate = "id") => {
+    var result: Array<DbBrand> | Array<DbHumidor> | Array<DbCigar> | Array<DbLibrary> | Array<DbHistory>
+    await db.transactionAsync(async (exc) => {
+      await exc.executeSqlAsync(value != undefined ? MDATABASE.SelectFromTable(table, the_key, value) : MDATABASE.SelectFromTable(table)).then((val) => {
+
+        if (isResultSet(val)) {
+          if ((val["rows"]) instanceof ) {
+            
+            result = val["rows"]
+          }
+        } else {
+
+
+        }
+
       })
     })
   }, [])
@@ -207,16 +247,16 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
   //              await exc.executeSqlAsync(MDATABASE.SelectFromTable("Cigar")).then((valko) => {
   //               o
   //              })
-               
+
   //             }
   //             setState(val["rows"])
 
   //           }
   //         } else {
 
-            
+
   //         }
-        
+
   //     })
   //   })
   // }, [])

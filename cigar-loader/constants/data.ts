@@ -56,8 +56,8 @@ export interface DbHumidor{
 
 
 export interface DbCigar{
-    brand_id:number;
     id: number;
+    brand_id:number;
     length: number;
     name: string;
     ring: RingType;
