@@ -101,6 +101,7 @@ export const DeleteFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library"
 export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",  the_key: keyof DbUpdate = "id", value?: string|number|Array<string|number>,) => {
     if (value!=undefined){
         if (Array.isArray(value)){
+            console.log(value)
             var the_string=""
             let array_index=value.length-1
             value.map((v, e)=>{
@@ -110,6 +111,7 @@ export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library"
                 ? the_string+= String(the_key) + " = " + String(v) + " OR "
                 : the_string+= String(the_key) + " = " + String(v) 
             }) 
+            console.log(`SELECT * FROM ${table} WHERE ${the_string};`)
             return (`SELECT * FROM ${table} WHERE ${the_string};`) 
         }
         return (`SELECT * FROM ${table} WHERE ${the_key} = ${value};`)

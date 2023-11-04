@@ -196,23 +196,25 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
       })
     })
   }, [])
-  const async_select_from_table = useCallback(async (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", value?: string | number | Array<string | number>, the_key: keyof DbUpdate = "id") => {
-    var result: Array<DbBrand> | Array<DbHumidor> | Array<DbCigar> | Array<DbLibrary> | Array<DbHistory>
+  const async_select_from_table = useCallback(async (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", value?: string | number | Array<string | number>, the_key: keyof DbUpdate = "id"):Promise<Array<any>> => {
+    var result: Array<any>=[]
     await db.transactionAsync(async (exc) => {
       await exc.executeSqlAsync(value != undefined ? MDATABASE.SelectFromTable(table, the_key, value) : MDATABASE.SelectFromTable(table)).then((val) => {
 
         if (isResultSet(val)) {
-          if ((val["rows"]) instanceof ) {
+          if ((val["rows"])  ) {
             
             result = val["rows"]
           }
         } else {
 
-
+          result=[]
         }
 
       })
-    })
+    }
+    )
+    return result
   }, [])
   // const test_select = useCallback(async(table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",setState?:React.Dispatch<React.SetStateAction<any>>, value?: string, the_key: keyof IUpdate = "id" ) => {
   //   var libraryItem:ILibrary= {
@@ -281,6 +283,7 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
     edit_table,
     delete_from_table,
     select_from_table,
+    async_select_from_table,
     handleHumidorList,
     handleLibraryList,
     handleSelectedHumidor,

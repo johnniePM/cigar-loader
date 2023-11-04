@@ -53,7 +53,15 @@ export interface DbHumidor{
     name:string;
     total_capacity:string
 }
-
+export interface DbLibrary {
+    cigar_id: number;
+    date_added: Date;
+    humidor_id: number;
+    id: number;
+    price: number;
+    qrCode: string;
+    total_number: number
+}
 
 export interface DbCigar{
     id: number;
@@ -64,15 +72,7 @@ export interface DbCigar{
     smoking_time: number
 }
 
-export interface DbLibrary {
-    cigar_id: number;
-    date_added: Date;
-    humidor_id: number;
-    id: number;
-    price: number;
-    qrCode: string;
-    total_number: number
-}
+
 
 export interface DbHistory {
     id?:number;

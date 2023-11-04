@@ -1,4 +1,4 @@
-import { GestureResponderEvent, LayoutAnimation, StyleSheet, View, ScrollView, Dimensions } from "react-native";
+import { GestureResponderEvent, LayoutAnimation, StyleSheet, View, ScrollView, Dimensions, Image,Animated } from "react-native";
 import { Avatar, Button, Card, Chip, Divider, Drawer, FAB, List, Menu, Portal, Searchbar, Surface, Text, useTheme } from "react-native-paper";
 import ScreenWrapper from "../components/ScreenWrapper";
 import { useCallback, useEffect, useState } from "react";
@@ -11,6 +11,8 @@ import { RootStackParamList } from "../navigation/StackNav";
 import { UseDatabase } from "../hooks/UseDatabase";
 import { DbBrand, DbHumidor, DbLibrary, IBrand, IHumidor } from "../constants";
 import { SelectFromTable } from "../Mocks/databases_mocks";
+import { checkIsBrand, checkIsCigar, checkIsHumidor, checkIsLibrary } from "../services/guards";
+// import Animated, { useSharedValue } from "react-native-reanimated";
 type ContextualMenuCoord = { x: number; y: number };
 
 const SCREENWIDTH = Dimensions.get("window").width;
@@ -23,7 +25,9 @@ export default function Home() {
     const [firstQuery, setFirstQuery] = useState<string>("");
     const [open, setOpen] = useState<boolean>(false);
     const [brand, setBrand] = useState<Array<DbBrand>>([])
-    const [humidor, setHumidor] = useState<Array<DbHumidor>>([])
+    const [humidorList, setHumidorList] = useState<Array<DbHumidor>>([])
+    const [selectedHumidorId, setSelectedHumidorId] = useState<number>()
+    const [brandList, setBrandList] = useState<Array<DbBrand>>([])
     const [library, setLibrary] = useState<Array<DbLibrary>>([])
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const database = UseDatabase()
@@ -41,10 +45,57 @@ export default function Home() {
     };
     const theme = useTheme()
     async function hello() {
-        await database.select_from_table("Humidor", setHumidor).then(()=>{
+        console.log("StartStartStartStartStartStartStartStart")
+        await database.async_select_from_table("Humidor").then(async (list_h) => {
             console.log("humidor")
-            console.log(humidor)
+            if (checkIsHumidor(list_h)) {
+                setHumidorList(list_h)
+                if (typeof list_h[0].id != "undefined") {
+                    setSelectedHumidorId(list_h[0].id)
+                }
+                return await database.async_select_from_table("Library", list_h[0].id, "humidor_id")
+            }
             console.log("humidor")
+        }).then(async (e) => {
+            if (typeof e != "undefined") {
+                if (checkIsLibrary(e)) {
+                    var cigar_ids: Array<number> = []
+                    e.map((v) => {
+                        if (!cigar_ids.includes(v.cigar_id)) {
+                            if (typeof v.cigar_id == "number" && !Number.isNaN(v.cigar_id)) {
+                                cigar_ids.push(v.cigar_id)
+
+                            }
+                        }
+                    })
+                    return await database.async_select_from_table("Cigar", cigar_ids, "id")
+                }
+            }
+
+        }).then(async (list_c) => {
+            if (typeof list_c != "undefined") {
+                if (checkIsCigar(list_c)) {
+                    var brand_ids: Array<number> = []
+                    list_c.map((v) => {
+                        if (!brand_ids.includes(v.brand_id)) {
+                            if (typeof v.brand_id == "number" && !Number.isNaN(v.brand_id)) {
+                                brand_ids.push(v.brand_id)
+
+                            }
+                        }
+                    })
+                    return await database.async_select_from_table("Brand", brand_ids, "id")
+                }
+            }
+        }).then((list_b) => {
+            // console.log(h)
+            if (typeof list_b != "undefined") {
+                if (checkIsBrand(list_b)) {
+                    setBrandList(list_b)
+                }
+            }
+            // return await database.async_select_from_table("Library", list_h[0].id, "humidor_id")
+
         })
     }
     useEffect(() => {
@@ -52,14 +103,21 @@ export default function Home() {
         // database.select_from_table("Library", database.handleLibraryList)
         // database.select_from_table("Cigar", database.handleCigarList)
         // database.select_from_table("Humidor", database.handleHumidorList)
-        console.log(SelectFromTable("Library", "id", ["dfs", "rewrew",31321, 432, "432432dsa"]))
 
-        console.log(SelectFromTable("Library", "id", "3232"))
         console.log(hello())
-        
+
 
     }, [])
 
+    const animated_card = () => {
+        // const Scale=useSharedValue(1)
+
+        return (
+            <Animated.View style={{ width: SCREENWIDTH * 0.65 + 20, alignItems: "center", overflow: "visible" }}>
+                <CoffeeCard />
+            </Animated.View>
+        )
+    }
 
     return (
         <View style={{ height: "100%", width: "100%", overflow: "visible" }}>
@@ -68,97 +126,52 @@ export default function Home() {
                     placeholder="Search"
                     onChangeText={(query: string) => setFirstQuery(query)}
                     value={firstQuery}
-                    style={{marginVertical:10,marginHorizontal:25, marginBottom:20 }}
+                    style={{ marginVertical: 10, marginHorizontal: 25, marginBottom: 20 }}
                 />
-                <ScrollView horizontal style={{paddingHorizontal:25, marginBottom:20}} showsHorizontalScrollIndicator={false}>
+                <ScrollView horizontal style={{ paddingHorizontal: 25, marginBottom: 20 }} showsHorizontalScrollIndicator={false}>
                     <Surface elevation={0} style={{ flexDirection: "row", columnGap: 20, rowGap: 20, marginBottom: 10 }} >
-                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}} selected ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
-                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}}  ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
-                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}}  ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
-                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}}  ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
-                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}}  ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
-                        <Chip style={{  borderRadius: 25 }} showSelectedOverlay onPress={()=>{}}  ><Text style={{ paddingVertical: 7, paddingHorizontal: 5}}> Living Room</Text></Chip>
-                        
-                        
-                        
-                        
+                        {humidorList.map((v) => {
+                            return (
+                                <Chip style={{ borderRadius: 25 }} showSelectedOverlay onPress={() => { setSelectedHumidorId(v.id) }} selected={selectedHumidorId == v.id} ><Text style={{ paddingVertical: 7, paddingHorizontal: 5 }}> {v.name}</Text></Chip>
+                            )
+                        })}
+
+
+
                     </Surface>
                 </ScrollView>
-                
+
                 <ScrollView
                     pagingEnabled
                     horizontal
-                    style={{ width: SCREENWIDTH, overflow: "visible" }}
-                    contentContainerStyle={{ overflow: "visible" }}
+                    style={{ width: SCREENWIDTH, overflow: "visible", flex: 1, }}
+                    contentContainerStyle={{ overflow: "visible", paddingTop: 50, paddingLeft: (SCREENWIDTH - 20 - (SCREENWIDTH * 0.65)) / 2, paddingRight: (SCREENWIDTH - 20 - (SCREENWIDTH * 0.65)), paddingBottom: 25 }}
                     showsHorizontalScrollIndicator={false}
-                    snapToInterval={ELEMENTWIDTH + SPACING / 3}
+                    snapToInterval={SCREENWIDTH - 150}
 
                 >
 
-                    {database.HumidorList?.map((value, index) => {
+                    {brandList?.map((value, index) => {
                         return (
                             <>
-                            <Card onPress={() => { }} style={{ marginBottom: 10, overflow: "visible", width: ELEMENTWIDTH, borderRadius: 60, marginLeft: index != 0 ? SPACING / 3 : SPACING - 16 }} mode="contained">
-                                <Card.Cover resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
-                                <Card.Title
 
-                                    title={value.name}
-                                    titleVariant="headlineSmall"
-                                />
-                                <Card.Content>
-                                    <List.Item
+                               {animated_card()}
+                               {animated_card()}
+                               {animated_card()}
+                               {animated_card()}
+                               {animated_card()}
+                               {animated_card()}
 
-                                        title="Cigars in humider"
-                                        description={"22/" + value.total_capacity}
-                                        left={(props) => <List.Icon {...props} icon="cigar" />}
-                                    />
-                                </Card.Content>
 
-                            </Card>
-                            <Card onPress={() => { }} style={{ marginBottom: 10, overflow: "visible", width: ELEMENTWIDTH, borderRadius: 60, marginLeft: index != 0 ? SPACING / 3 : SPACING - 16 }} mode="contained">
-                                <Card.Cover resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
-                                <Card.Title
-
-                                    title={value.name}
-                                    titleVariant="headlineSmall"
-                                />
-                                <Card.Content>
-                                    <List.Item
-
-                                        title="Cigars in humider"
-                                        description={"22/" + value.total_capacity}
-                                        left={(props) => <List.Icon {...props} icon="cigar" />}
-                                    />
-                                </Card.Content>
-
-                            </Card>
-                            <Card onPress={() => { }} style={{ marginBottom: 10, overflow: "visible", width: ELEMENTWIDTH, borderRadius: 60, marginLeft: index != 0 ? SPACING / 3 : SPACING - 16 }} mode="contained">
-                                <Card.Cover resizeMode="contain" style={{ backgroundColor: theme.colors.outlineVariant, overflow: "visible", }} source={require('../assets/images/Cigar_Humidor2.png')} />
-                                <Card.Title
-
-                                    title={value.name}
-                                    titleVariant="headlineSmall"
-                                />
-                                <Card.Content>
-                                    <List.Item
-
-                                        title="Cigars in humider"
-                                        description={"22/" + value.total_capacity}
-                                        left={(props) => <List.Icon {...props} icon="cigar" />}
-                                    />
-                                </Card.Content>
-
-                            </Card>
                             </>
                         )
                     })}
 
-                    <View style={{ width: SPACING }} />
 
                 </ScrollView>
 
                 {settings.ShowQuickStats &&
-                    <Card mode="contained" style={{ marginBottom: 20 }} onPress={() => handleExpanded()}>
+                    <Card mode="contained" style={{ marginBottom: 20, marginHorizontal: 20 }} onPress={() => handleExpanded()}>
                         <Card.Title
                             title="Quick Statistics"
                             left={(props) => <Avatar.Icon {...props} icon="chart-bubble" />
