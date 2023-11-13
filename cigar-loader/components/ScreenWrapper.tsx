@@ -46,7 +46,7 @@ export default function ScreenWrapper({
           contentContainerStyle={contentContainerStyle}
           alwaysBounceVertical={false}
           showsVerticalScrollIndicator={false}
-          style={[containerStyle, style]}
+          style={[containerStyle, style,{backgroundColor:"#00000000"}]}
         >
           {children}
         </ScrollView>

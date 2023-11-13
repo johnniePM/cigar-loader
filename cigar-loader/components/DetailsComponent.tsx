@@ -26,7 +26,8 @@ function DetailComponent({
   increase,
   number,
   buttonText,
-  onPress
+  onPress,
+  Component
 }: IDetailComponent) {
   const [totalNumber, setTotalNumber] = useState<number>(0)
   const [name, setName] = useState<string>("")
@@ -64,10 +65,19 @@ function DetailComponent({
 
             }}
           >
+            {foregroundImage&&
             <Image source={foregroundImage} resizeMode='contain' style={{ marginTop: ios ? 0 : 80, height: 240, width: 240, borderWidth: 1, transform: [{ scale: 2 }], }} />
+            }
+
+      {Component ? (
+        <View >
+          {Component()}
+        </View>
+      ) : null}
+
           </View>
           <View
-            style={{ backgroundColor: "#d4a574", flexDirection: "row", justifyContent: "center", alignItems: "center", marginHorizontal: 16, borderRadius: 16, padding: 4, paddingHorizontal: 8, opacity: 0.9, width: 64 }}
+            style={{ backgroundColor: "#d4a574", flexDirection: "row", justifyContent: "center", alignItems: "center", marginHorizontal: 16, borderRadius: 16, padding: 4, paddingHorizontal: 16, opacity: 0.9, alignSelf:"flex-start" }}
           >
             <Text style={{ color: "white", fontWeight: "700" }}>{short}</Text>
           </View>

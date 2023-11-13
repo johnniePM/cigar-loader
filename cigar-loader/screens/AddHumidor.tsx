@@ -21,7 +21,7 @@ export default function AddHumidor(props: any) {
 
   const handle_add=()=>{
     console.log("dsadsadsadsasad")
-    database.add_to_humidor({"name":name,total_capacity:String(totalNumber)})
+    database.add_to_humidor({"name":name,total_capacity:String(totalNumber), id:NaN})
     console.log("dsadsadsadsasad2")
     setTimeout(() => {
       database.select_from_table("Humidor", database.handleHumidorList)

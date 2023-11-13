@@ -1,18 +1,18 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 
 import * as SQLite from 'expo-sqlite';
-import { IBrand, ICigar, IHistory, IHumidor, ILibrary } from "../constants";
 import { MDATABASE } from "../Mocks";
-import { DbBrand, DbCigar, DbHistory, DbHumidor, DbLibrary, DbUpdate, IUpdate } from "../constants/data";
+import { DbBrand, DbCigar, DbHistory, DbHumidor, DbLibrary, DbUpdate } from "../constants";
 import { IUseDatabase } from "../constants/Components";
+import { Text } from "react-native-paper";
 
 export const DataContext = React.createContext({});
 
-function openDatabase() {
+function openDatabas() {
 
 
-  const db = SQLite.openDatabase('Cigar.db');
-  return db;
+  const db_1 = SQLite.openDatabase('Cigar.db');
+  return db_1;
 }
 
 function isResultSet(object: any): object is SQLite.SQLResultSet {
@@ -21,47 +21,10 @@ function isResultSet(object: any): object is SQLite.SQLResultSet {
 
 
 
-function checkIsType(object: Array<any>): object is Array<DbUpdate> {
-  var isit: boolean = true
-  object.map((v) => {
-    if ("cigar_id" in v &&
-      "date_added" in v &&
-      "humidor_id" in v &&
-      "id" in v &&
-      "price" in v &&
-      "qrCode" in v &&
-      "qrCode" in v &&
-      "total_number" in v &&
-      "name" in v &&
-      "origin" in v && 
-      "name" in v &&
-      "total_capacity" in v && 
-      "brand_id" in v && 
-      "length" in v && 
-      "name" in v && 
-      "ring" in v && 
-      "smoking_time" in v && 
-      "cigar" in v && 
-      "date_added" in v && 
-      "date_used" in v && 
-      "rate" in v && 
-      "comment" in v && 
-      "self_used" in v 
 
-     
-     
-      ){
-
-  }
-    else {
-    isit = false
-  }
-})
-return isit
-}
+const db = openDatabas();
 
 
-const db = openDatabase();
 
 export const DatabaseProvider = ({ children }: { children: React.ReactNode }) => {
   const [HumidorList, handleHumidorList] = useState<Array<DbHumidor>>([])
@@ -69,29 +32,29 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
   const [CigarList, handleCigarList] = useState<Array<DbCigar>>([])
   const [selectedHumidor, handleSelectedHumidor] = useState<DbHumidor>()
   const [selectedLibrary, handleSelectedLibrary] = useState<DbLibrary>()
+  const [created, setCreated]=useState<boolean>(false)
 
 
 
+  const create_tables = useCallback(async() => {
+    await db.transactionAsync(async (exc) => {
+      await exc.executeSqlAsync(MDATABASE.CreateBrandTable);
+      await exc.executeSqlAsync(MDATABASE.CreateCigarTable);
+      await exc.executeSqlAsync(MDATABASE.CreateHistoryTable);
+      await exc.executeSqlAsync(MDATABASE.CreateHumidorTable);
+      await exc.executeSqlAsync(MDATABASE.CreateLibraryTable);
+    }).then(async() => {
+      setCreated(true)
 
-  const create_tables = useCallback(() => {
-    db.transactionAsync(async (exc) => {
-      exc.executeSqlAsync(MDATABASE.CreateBrandTable);
-      exc.executeSqlAsync(MDATABASE.CreateCigarTable);
-      exc.executeSqlAsync(MDATABASE.CreateHistoryTable);
-      exc.executeSqlAsync(MDATABASE.CreateHumidorTable);
-      exc.executeSqlAsync(MDATABASE.CreateLibraryTable);
-    }).then(() => {
     }, (reason) => {
     })
   }, [])
 
-  const add_to_brand = useCallback(async (brand: IBrand): Promise<number> => {
-    // console.log("haahahhaaaaaaaaaaa")
+  const add_to_brand = useCallback(async (brand: DbBrand): Promise<number> => {
     var id: number = NaN
     await db.transactionAsync(async (exc) => {
       await exc.executeSqlAsync(MDATABASE.AddBrandTable(brand)).then((g) => {
         if (typeof g.insertId != "undefined") {
-          console.log("type is not undefined")
           id = g.insertId
         }
       })
@@ -109,11 +72,11 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
           id = g.insertId
 
         }
-      }).catch(e => { console.log(e) })
+      }).catch(e => {  })
     })
     return id
   }, [])
-  const add_to_humidor = useCallback(async (humidor: IHumidor): Promise<number | undefined> => {
+  const add_to_humidor = useCallback(async (humidor: DbHumidor): Promise<number | undefined> => {
     var id: number | undefined = undefined
 
     await db.transactionAsync(async (exc) => {
@@ -121,7 +84,7 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
         if (typeof g.insertId != "undefined") {
           id = g.insertId
         }
-      })
+      }).catch((e)=>{})
     })
     return id
   }, [])
@@ -179,11 +142,8 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
   const select_from_table = useCallback(async (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", setState?: React.Dispatch<React.SetStateAction<any>>, value?: string | number | Array<string | number>, the_key: keyof DbUpdate = "id") => {
     await db.transactionAsync(async (exc) => {
       await exc.executeSqlAsync(value != undefined ? MDATABASE.SelectFromTable(table, the_key, value) : MDATABASE.SelectFromTable(table)).then((val) => {
-        //  console.log(val)
         if (isResultSet(val)) {
-          // console.log(val)
           if (setState != undefined) {
-            // console.log(val)
             
             setState(val["rows"])
 
@@ -240,11 +200,8 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
   // }
   //    await db.transactionAsync(async (exc) => {
   //      await exc.executeSqlAsync(value != undefined ? MDATABASE.SelectFromTable(table, the_key, value) : MDATABASE.SelectFromTable(table)).then(async (val) => {
-  //        //  console.log(val)
   //        if (isResultSet(val)) {
-  //          // console.log(val)
   //          if(setState!=undefined){
-  //            // console.log(val)
   //            if (checkIsLibrary(val.rows)){
   //              await exc.executeSqlAsync(MDATABASE.SelectFromTable("Cigar")).then((valko) => {
   //               o
@@ -268,6 +225,7 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
 
   useEffect(() => {
     create_tables()
+
     return () => {
     }
   }, [])
@@ -300,9 +258,20 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
     // article,
     // handleArticle,
   };
-  return (
-    <DataContext.Provider value={contextValue}>{children}</DataContext.Provider>
-  );
+  if (created){
+
+    return (
+      
+      <DataContext.Provider value={contextValue}>{children}</DataContext.Provider>
+      );
+    }
+    else{
+      return(
+        <Text>
+          Hello
+        </Text>
+      )
+    }
 };
 
 export const UseDatabase = () => useContext(DataContext) as IUseDatabase;

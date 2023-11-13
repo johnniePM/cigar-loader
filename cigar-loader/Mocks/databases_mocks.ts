@@ -1,4 +1,4 @@
-import { DbBrand, DbCigar, DbHumidor, DbLibrary, DbUpdate, IBrand, ICigar, IHistory, IHumidor, ILibrary, IUpdate } from "../constants/data"
+import { DbBrand, DbCigar, DbHistory, DbHumidor, DbLibrary, DbUpdate } from "../constants/data"
 
 export const CreateBrandTable = `CREATE TABLE IF NOT EXISTS Brand (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,7 +74,7 @@ VALUES ('${library.qrCode}', '${library.cigar_id}' , '${library.total_number}' ,
 }
 
 
-export const AddHistoryTable = (History: IHistory) => {
+export const AddHistoryTable = (History: DbHistory) => {
     return `INSERT INTO History (cigar_id, date_added, date_used, rate, comment, self_used)
 VALUES ('${History.cigar.id}', '${History.date_added}' , '${History.date_used}' , '${History.rate}' , '${History.comment}' , '${History.self_used}');`
 }
@@ -101,17 +101,17 @@ export const DeleteFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library"
 export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",  the_key: keyof DbUpdate = "id", value?: string|number|Array<string|number>,) => {
     if (value!=undefined){
         if (Array.isArray(value)){
-            console.log(value)
+
             var the_string=""
             let array_index=value.length-1
             value.map((v, e)=>{
-                // console.log(e)
-                // console.log(array_index)
+                
+                
                 e < array_index 
                 ? the_string+= String(the_key) + " = " + String(v) + " OR "
                 : the_string+= String(the_key) + " = " + String(v) 
             }) 
-            console.log(`SELECT * FROM ${table} WHERE ${the_string};`)
+
             return (`SELECT * FROM ${table} WHERE ${the_string};`) 
         }
         return (`SELECT * FROM ${table} WHERE ${the_key} = ${value};`)

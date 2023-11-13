@@ -44,12 +44,12 @@ export interface IHistory {
 }
 
 export interface DbBrand{
-    id?:number;
+    id:number;
     name:string;
     origin:string
 }
 export interface DbHumidor{
-    id?:number;
+    id:number;
     name:string;
     total_capacity:string
 }
@@ -75,7 +75,7 @@ export interface DbCigar{
 
 
 export interface DbHistory {
-    id?:number;
+    id:number;
     cigar:ICigar;
     date_added:Date;
     date_used:Date;

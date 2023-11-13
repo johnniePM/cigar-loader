@@ -35,9 +35,7 @@ const Autocomplete = ({
     );
   };
   React.useEffect(()=>{
-    console.log("data")
-    console.log(data)
-    console.log("data")
+
     },[])
   return (
     <View style={[containerStyle]}>

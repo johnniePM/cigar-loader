@@ -3,13 +3,18 @@ import React from 'react'
 import { useNavigation } from '@react-navigation/native'
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Shadow } from 'react-native-shadow-2';
+import { ICoffeeCard } from '../constants';
+import Animated from 'react-native-reanimated';
+
+
 
 const { width, height } = Dimensions.get('window');
 const ios = Platform.OS == 'ios';
-export default function CoffeeCard(props: any) {
-    const navigation = useNavigation();
+ function CoffeeCard({info, brand, onPress=()=>{}}: ICoffeeCard) {
+    
     return (
         <Shadow
+            style={{zIndex:20}}
             distance={30}
             startColor={"#8c531970"}
             endColor={"#00000000"}
@@ -25,10 +30,10 @@ export default function CoffeeCard(props: any) {
                     backgroundColor: "#8c5319",
                     width: width * 0.65,
                     overflow: "visible",
+                    zIndex:20
                     
                 }}
             >
-
                 <View
                     style={{
 
@@ -36,7 +41,7 @@ export default function CoffeeCard(props: any) {
                         flexDirection: "row",
                         justifyContent: "center",
                         overflow: "visible",
-
+                        zIndex:20
 
 
 
@@ -46,26 +51,26 @@ export default function CoffeeCard(props: any) {
                         source={require('../assets/images/CigarHumidor2.png')}
                         resizeMode='contain'
                         style={{
-                            height: 200, width: 200, overflow: "visible"
+                            height: 200, width: 200, overflow: "visible", zIndex:20
                         }}
 
                     />
                 </View>
-                <View style={{ paddingHorizontal: 20, flex: 1, justifyContent: "space-between", marginTop: 5 }} >
+                <View style={{ paddingHorizontal: 20, flex: 1, justifyContent: "space-between", marginTop: 5, zIndex:20 }} >
                     <View style={{ rowGap: 12, marginTop: 3 }} >
-                        <Text style={{ fontSize: 30, fontWeight: "800", zIndex: 10, color: "white" }}>
-                            dsadsadsa
+                        <Text style={{ fontSize: 30, fontWeight: "800", zIndex: 20, color: "white",  }}>
+                            {brand.name}
                         </Text>
                         <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', flexDirection: "row", alignItems: "center", borderRadius: 20, padding: 4, paddingHorizontal: 8, alignSelf: "flex-start" }}
                         >
                             <Ionicons name='star' size={15} color="white" />
-                            <Text style={{ fontWeight: "700", color: "white" }} >4.5</Text>
+                            <Text style={{ fontWeight: "700", color: "white" }} >{"  "+brand.origin}</Text>
                         </View>
-                        <View style={{ flexDirection: "row", rowGap: 4, zIndex: 10, marginBottom: 24 }} >
+                        <View style={{ flexDirection: "row", rowGap: 4, zIndex: 20, marginBottom: 24 }} >
                             <Text style={{ color: "white", opacity: 0.6 }} >
-                                Volume
+                                {"Total number in humider:  "}
                             </Text>
-                            <Text style={{ fontWeight: "700", color: "white", }} > 150</Text>
+                            <Text style={{ fontWeight: "700", color: "white", }} > {info?.brand_cigars}</Text>
                         </View>
                     </View>
 
@@ -82,9 +87,9 @@ export default function CoffeeCard(props: any) {
                         marginBottom: 20
                     }}
                     >
-                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 20 }} >$ 20</Text>
+                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 20 }} >Price:  {info?.brand_valuation+".00"}</Text>
                         <TouchableOpacity
-                            onPress={() => { }}
+                            onPress={() => {onPress() }}
                             style={{
                                 shadowColor: 'black',
                                 shadowRadius: 40,
@@ -107,3 +112,5 @@ export default function CoffeeCard(props: any) {
 
     )
 }
+
+export default React.memo(CoffeeCard)

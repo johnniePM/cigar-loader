@@ -223,51 +223,9 @@ export default function AddCigar(props: any) {
         var brand_exists: boolean = false
         
         var cigar_exists: boolean = false
-        
+        var isReturn:boolean=false
+
         const check_cigar = checkIsCigarCorrect(cigar)
-        
-        setIsCigarCorrect(check_cigar)
-        
-        Object.keys(check_cigar).map((v: PersonKeys | string) => {
-            if (v == "brand_id" || v == "length" || v == "name" || v == "ring" || v == "smoking_time" || v == "id") {
-                
-                if (!check_cigar[v]) {
-                    return
-                }
-                
-            }
-        })
-        
-        const check_brand = checkIsBrandCorrect(Brand)
-        
-        setIsBrandCorrect(check_brand)
-        
-        Object.keys(check_brand).map((v: string) => {
-            if (v == "id" || v == "name" || v == "origin") {
-                
-                if (!check_brand[v]) {
-                    return
-                }
-                
-            }
-        })
-        
-        const check_info = checkIsInfoCorrect(Library, database.HumidorList)
-        
-        setIsInfoCorrect(check_info)
-        
-        Object.keys(check_info).map((v: string) => {
-            
-            if (v == "cigar_id" || v == "date_added" || v == "humidor_id" || v == "price" || v == "qrCode" || v == "total_number" || v == "id") {
-                
-                if (!check_info[v]) {
-                    return
-                }
-                
-            }
-        })
-        
-        
         var LibraryItem = Library
         var CigarItem = cigar
         var BrandItem = Brand
@@ -281,14 +239,66 @@ export default function AddCigar(props: any) {
             counter += 1;
         }
         LibraryItem.qrCode = result
+        setIsCigarCorrect(check_cigar)
+        
+        console.log("isReturn Start")
+        console.log(isReturn)
+        Object.keys(check_cigar).map((v: PersonKeys | string) => {
+            if (v == "brand_id" || v == "length" || v == "name" || v == "ring" || v == "smoking_time" || v == "id") {
+                
+                if (!check_cigar[v]) {
+                    isReturn=true
+                }
+                
+            }
+        })
+        
+        const check_brand = checkIsBrandCorrect(Brand)
+        
+        setIsBrandCorrect(check_brand)
+        console.log(isReturn)
+        Object.keys(check_brand).map((v: string) => {
+            if (v == "id" || v == "name" || v == "origin") {
+                
+                if (!check_brand[v]) {
+                    isReturn=true
+                }
+                
+            }
+        })
+        
+        const check_info = checkIsInfoCorrect(LibraryItem, database.HumidorList)
+        
+        setIsInfoCorrect(check_info)
+        console.log(isReturn)
+        
+        Object.keys(check_info).map((v: string) => {
+            
+            if (v == "cigar_id" || v == "date_added" || v == "humidor_id" || v == "price" || v == "qrCode" || v == "total_number" || v == "id") {
+                
+                if (!check_info[v]) {
+                    console.log(v)
+                    console.log(Library.qrCode)
+                    isReturn=true
+                }
+                
+            }
+        })
+        console.log(isReturn)
+        if(isReturn){
+            return
+        }
+
         
         
         database.CigarList.map((v, e) => {
             
             if (v.name == cigar.name && v.length == cigar.length && v.ring == cigar.ring && v.smoking_time == cigar.smoking_time) {
                 cigar_exists = true
+                
                 if (typeof v.id != "undefined") {
                     CigarItem.id = v.id
+                    LibraryItem.cigar_id=v.id
                 }
                 
             }
@@ -302,6 +312,7 @@ export default function AddCigar(props: any) {
                 CigarItem.brand_id = v.id!=undefined?v.id:NaN
             }
         })
+  
         if (!brand_exists) {
             BrandItem.id = await database.add_to_brand(Brand)
             CigarItem.brand_id=BrandItem.id
@@ -323,9 +334,10 @@ export default function AddCigar(props: any) {
         await database.add_to_library(LibraryItem)
         
         database.select_from_table("Cigar", database.handleCigarList)
-        
-        // database.select_from_table("Brand", brand)
-        // data.handleCigarList
+        setTimeout(() => {
+            navigation.goBack()
+        }, 500); 
+
     }
 
     const navigation = useNavigation();
@@ -335,9 +347,7 @@ export default function AddCigar(props: any) {
             backgroundImage={require('../assets/images/Background.png')}
             foregroundImage={require('../assets/images/CigarHumidor2WithShadow.png')}
             buttonText='Adding A Cigar'
-            onPress={() => { handle_add_cigar(); setTimeout(() => {
-                navigation.goBack()
-            }, 500); }}
+            onPress={() => { handle_add_cigar(); }}
             short='new'
             topText={"Adding A Cigar"}
             increase={() => {

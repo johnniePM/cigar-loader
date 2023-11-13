@@ -61,6 +61,7 @@ export default function Main() {
 
 
             <Menu/>
+
             </SettingsProvider>
         </PaperProvider>
     );

@@ -11,9 +11,9 @@ import {
     DbHumidor,
     DbLibrary,
     DbUpdate,
-    RingType
+    RingType,
 } from "./data"
-import { IUseDatabase, ICounterComponent, IDetailComponent,IAutoComplete } from "./Components"
+import { IUseDatabase, ICounterComponent, IDetailComponent,IAutoComplete, IHomeInfo, IHomeStats, ICoffeeCard, IHomeBrand } from "./Components"
 
 
 
@@ -34,6 +34,10 @@ export {
     ICounterComponent,
     IDetailComponent,
     IAutoComplete,
-    DbUpdate
+    DbUpdate,
+    IHomeInfo,
+    IHomeStats,
+    ICoffeeCard,
+    IHomeBrand
 
 }
