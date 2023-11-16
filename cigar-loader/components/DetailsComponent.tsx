@@ -34,7 +34,7 @@ function DetailComponent({
 
   const navigation = useNavigation();
   return (
-    <View style={{ flex: 1, }}>
+    <View style={{ flex: 1, zIndex:1}}>
       <StatusBar style="light" />
       <Image
         source={backgroundImage}
