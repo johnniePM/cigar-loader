@@ -43,12 +43,14 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
       await exc.executeSqlAsync(MDATABASE.CreateHistoryTable);
       await exc.executeSqlAsync(MDATABASE.CreateHumidorTable);
       await exc.executeSqlAsync(MDATABASE.CreateLibraryTable);
+
     }).then(async() => {
       setCreated(true)
 
     }, (reason) => {
     })
   }, [])
+
 
   const add_to_brand = useCallback(async (brand: DbBrand): Promise<number> => {
     var id: number = NaN

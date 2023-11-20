@@ -35,18 +35,19 @@ export const CreateLibraryTable = `CREATE TABLE IF NOT EXISTS Library (
     humidor_id INTEGER NOT NULL,
     FOREIGN KEY (cigar_id) REFERENCES Cigar (id),
     FOREIGN KEY (humidor_id) REFERENCES Humidor (id)
-);`
+    );`
 
 
 export const CreateHistoryTable = `CREATE TABLE IF NOT EXISTS History (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    cigar_id INTEGER NOT NULL,
-    date_added DATETIME NOT NULL,
-    date_used DATETIME NOT NULL,
-    rate TEXT NOT NULL,
-    comment TEXT NOT NULL,
-    self_used INTEGER NOT NULL,
-    FOREIGN KEY (cigar_id) REFERENCES Cigar (id)
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cigar_id INTEGER NOT NULL,
+        library_id INTEGER NOT NULL,
+        date_used DATETIME NOT NULL,
+        rate INTEGER NOT NULL,
+        comment TEXT NOT NULL,
+        self_used INTEGER NOT NULL,
+        FOREIGN KEY (library_id) REFERENCES Library (id),
+        FOREIGN KEY (cigar_id) REFERENCES Cigar (id)
 );`
 
 
@@ -86,7 +87,7 @@ export const EditTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "Hi
 
     Object.keys(update).map((i, e) => {
         const rest = e < last_index ? " , " : " "
-        the_string += String(i) + " = " + "'"+ update[i as keyof DbUpdate]+"'" + rest
+        the_string += String(i) + " = " + "'" + update[i as keyof DbUpdate] + "'" + rest
     })
 
     return (`UPDATE ${table} SET ${the_string} WHERE id = ${id}`)
@@ -98,24 +99,24 @@ export const DeleteFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library"
     return (`DELETE FROM ${table} WHERE id = ${id};`)
 }
 
-export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History",  the_key: keyof DbUpdate = "id", value?: string|number|Array<string|number>,) => {
-    if (value!=undefined){
-        if (Array.isArray(value)){
+export const SelectFromTable = (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", the_key: keyof DbUpdate = "id", value?: string | number | Array<string | number>,) => {
+    if (value != undefined) {
+        if (Array.isArray(value)) {
 
-            var the_string=""
-            let array_index=value.length-1
-            value.map((v, e)=>{
-                
-                
-                e < array_index 
-                ? the_string+= String(the_key) + " = " + String(v) + " OR "
-                : the_string+= String(the_key) + " = " + String(v) 
-            }) 
+            var the_string = ""
+            let array_index = value.length - 1
+            value.map((v, e) => {
 
-            return (`SELECT * FROM ${table} WHERE ${the_string};`) 
+
+                e < array_index
+                    ? the_string += String(the_key) + " = " + String(v) + " OR "
+                    : the_string += String(the_key) + " = " + String(v)
+            })
+
+            return (`SELECT * FROM ${table} WHERE ${the_string};`)
         }
         return (`SELECT * FROM ${table} WHERE ${the_key} = ${value};`)
-    }else{
+    } else {
         return (`SELECT * FROM ${table};`)
     }
 }
