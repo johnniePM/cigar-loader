@@ -13,6 +13,7 @@ import Settings from '../screens/Settings';
 import AddHumidor from '../screens/AddHumidor';
 import { DbBrand, IHomeBrand } from '../constants';
 import Animated from 'react-native-reanimated';
+import AddHistory from '../screens/AddHistory';
 
 export type RootStackParamList = {
   Home: any;
@@ -22,6 +23,7 @@ export type RootStackParamList = {
   Library: { "info": IHomeBrand, "brand": DbBrand, index: number };
   Settings: any;
   AddHumidor: any;
+  AddHistory: any;
 };
 export type RootRouteProps<RouteName extends keyof RootStackParamList> = RouteProp<
   RootStackParamList,
@@ -78,6 +80,12 @@ export default () => {
       <Stack.Screen
         name="AddHumidor"
         component={AddHumidor}
+        options={{ headerShown: false }}
+      // options={{title: 'Hem',}}
+      />
+      <Stack.Screen
+        name="AddHistory"
+        component={AddHistory}
         options={{ headerShown: false }}
       // options={{title: 'Hem',}}
       />

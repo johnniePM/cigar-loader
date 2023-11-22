@@ -7,7 +7,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { Surface, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Props = ScrollViewProps & {
@@ -46,12 +46,12 @@ export default function ScreenWrapper({
           contentContainerStyle={contentContainerStyle}
           alwaysBounceVertical={false}
           showsVerticalScrollIndicator={false}
-          style={[containerStyle, style,{backgroundColor:"#00000000"}]}
+          style={[containerStyle, style,{backgroundColor:theme.colors.elevation.level1}]}
         >
           {children}
         </ScrollView>
       ) : (
-        <View style={[containerStyle, style]}>{children}</View>
+        <Surface elevation={5} style={[containerStyle, style]}>{children}</Surface>
       )}
     </>
   );

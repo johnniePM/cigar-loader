@@ -408,12 +408,12 @@ export default function Home() {
                 icon={open ? 'minus' : 'plus'}
                 actions={[
 
-                    { icon: 'cigar', label: 'Add new cigar', onPress: () => { } },
+                    { icon: 'cigar', label: 'Add new cigar', onPress: () => { navigation.navigate("AddCigar")} },
                     { icon: 'dresser-outline', label: 'Add New Humidor', onPress: () => { navigation.navigate("AddHumidor") } },
                     {
                         icon: 'content-save-edit',
                         label: 'Report Smoking a Cigar',
-                        onPress: () => { },
+                        onPress: () => {navigation.navigate("AddHistory") },
                         size: theme.isV3 ? 'small' : 'medium',
                     },
                 ]}
