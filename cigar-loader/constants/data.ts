@@ -77,7 +77,6 @@ export interface DbCigar{
 export interface DbHistory {
     id:number;
     cigar:ICigar;
-    date_added:Date;
     date_used:Date;
     rate:string;
     comment:string;
