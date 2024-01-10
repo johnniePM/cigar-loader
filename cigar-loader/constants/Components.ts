@@ -14,10 +14,10 @@ export interface IUseDatabase {
     select_from_table: (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", setState?: React.Dispatch<React.SetStateAction<any>>, value?: string, the_key?: keyof DbUpdate) => Promise<any>;
     async_select_from_table: (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", value?: string | number | Array<string | number>, the_key?: keyof DbUpdate) => Promise<Array<DbBrand> | Array<DbHumidor> | Array<DbCigar> | Array<DbLibrary> | Array<DbHistory>>;
     HumidorList: Array<DbHumidor>;
-    LibraryList: Array<ILibrary>;
+    LibraryList: Array<DbLibrary>;
     selectedHumidor: IHumidor;
     selectedLibrary: IHumidor;
-    CigarList: Array<ICigar>;
+    CigarList: Array<DbCigar>;
     handleCigarList(): any
     handleLibraryList(): any;
     handleHumidorList(): any;

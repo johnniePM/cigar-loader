@@ -1,6 +1,6 @@
 import react, { useState, useEffect, useRef, Ref, createRef } from "react"
 import { Appbar, Chip, Surface, Text, TouchableRipple, TouchableRippleProps, useTheme, TextInput, Button, RadioButton, Switch } from "react-native-paper";
-import { SafeAreaView, View, LayoutAnimation, Pressable, ScrollView } from "react-native";
+import { SafeAreaView, View, LayoutAnimation, Pressable, ScrollView , VibrationStatic, Vibration} from "react-native";
 import Animated, {
     useSharedValue,
     withTiming,
@@ -15,6 +15,11 @@ import CounterComponent from '../components/Counter';
 import { DateTimePickerAndroid, DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { Slider } from "react-native-awesome-slider";
+import * as Haptics from 'expo-haptics';
+import { DbBrand, DbCigar, DbHistory, DbHumidor, DbLibrary } from "../constants";
+import { UseDatabase } from "../hooks/UseDatabase";
+import { checkIsBrand, checkIsCigar } from "../services/guards";
+
 const END_POSITION = 200;
 
 export default function AddHistory() {
@@ -25,12 +30,26 @@ export default function AddHistory() {
     const [number, setNumber] = useState<number>(0)
     const [date, setDate] = useState<Date>(new Date())
     const [checker, setchecker] = useState<boolean>(true)
-
+    const [selectedHumidor, setSelectedHumidor]=useState<DbHumidor>({id:NaN, name:"", total_capacity:"0"})
+    const [selectedBrand, setSelectedBrand]=useState<DbBrand>()
+    const [availableBrands, setAvailableBrands]=useState<Array<DbBrand>>()
+    const [availableCigars, setAvailableCigars]=useState<Array<DbCigar>>()
+    const [availableLibrary, setAvailableLibrary]=useState<Array<DbLibrary>>()
+    const [History, setHistory]=useState<DbHistory>({
+        cigar_id:NaN,
+        comment:"",
+        date_used:"",
+        library_id:NaN,
+        rate:"5",
+        self_used:1,
+        id:NaN
+    })
     const progress = useSharedValue(5);
     const min = useSharedValue(0);
     const max = useSharedValue(10);
 
 
+    const database = UseDatabase()
 
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const theme = useTheme()
@@ -40,6 +59,84 @@ export default function AddHistory() {
             setDate(selectedDate)
         }
     };
+
+    const select_humidor=(v:DbHumidor)=>{
+        setSelectedHumidor(v)
+        const library_items:DbLibrary[]=database.LibraryList
+        library_items.filter((e)=>{return(e.humidor_id==v.id && e.total_number>0)})
+        setAvailableLibrary(library_items)
+        const cigar_ids:Array<number>=library_items.reduce((accumulator:Array<number>, currentItem) => {
+            // Assuming currentItem has a property called cigar_id
+            const cigarId: number = currentItem.cigar_id;
+        
+            // Check if the cigar_id is not already in the accumulator array
+            if (!accumulator.includes(cigarId)) {
+                // If not, add it to the accumulator array
+                accumulator.push(cigarId);
+            }
+        
+            return accumulator;
+        }, []);
+        database.async_select_from_table("Cigar", cigar_ids, "id").then((cigar_list)=>{
+            if (checkIsCigar(cigar_list)){
+                setAvailableCigars(cigar_list)
+                return cigar_list
+            }
+        }).then((cigar_list)=>{
+            if (cigar_list!=undefined){
+                const brand_id:Array<number>=cigar_list.reduce((accumulator:Array<number>, currentItem) => {
+                    // Assuming currentItem has a property called cigar_id
+                    const cigarId: number = currentItem.brand_id;
+                
+                    // Check if the cigar_id is not already in the accumulator array
+                    if (!accumulator.includes(cigarId)) {
+                        // If not, add it to the accumulator array
+                        accumulator.push(cigarId);
+                    }
+                
+                    return accumulator;
+                }, []);
+                return database.async_select_from_table("Brand", brand_id, "id")
+            }
+        }).then((brand_list)=>{
+            if(brand_list!=undefined&& checkIsBrand(brand_list)){
+                setAvailableBrands(brand_list)
+                // setAvailableBrands(brand_list)
+            }
+        }).finally(()=>{
+            setScreen(2); setAvailableScreens(2);
+        })
+
+
+
+    }
+    const select_brand=(v:DbBrand)=>{
+        setSelectedBrand(v)
+        const library_items:DbLibrary[]=database.LibraryList
+        library_items.filter((e)=>{return(e.humidor_id==selectedHumidor.id && e.total_number>0)})
+        setAvailableLibrary(library_items)
+        const cigar_ids:Array<number>=library_items.reduce((accumulator:Array<number>, currentItem) => {
+            const cigarId: number = currentItem.cigar_id;
+            if (!accumulator.includes(cigarId)) {
+                accumulator.push(cigarId);
+            }
+            return accumulator;
+        }, []);
+
+        database.async_select_from_table("Cigar", cigar_ids, "id").then((cigar_list)=>{
+            if (checkIsCigar(cigar_list)){
+                cigar_list=cigar_list.filter((i)=>i.brand_id==v.id)
+                setAvailableCigars(cigar_list)
+                return cigar_list
+            }
+        }).finally(()=>{
+            setScreen(3);
+            setAvailableScreens(3)
+        })
+
+
+
+    }
 
     const showDate = () => {
         DateTimePickerAndroid.open({
@@ -55,7 +152,9 @@ export default function AddHistory() {
 
     }, [isCameraPressed])
     useEffect(() => {
-
+        console.log(database.CigarList)
+        console.log(database.HumidorList)
+        console.log(database.LibraryList)
 
 
     }, [])
@@ -127,59 +226,53 @@ export default function AddHistory() {
                     </ScrollView>
                     {screen == 1 &&
                         <Surface elevation={0} style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, justifyContent: "space-between", rowGap: 20, paddingHorizontal: 10, }}>
+                            {database.HumidorList.map((v)=>{
+                                return(
+                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", paddingVertical:20 }}>
+                                <TouchableRipple onPress={() => {  select_humidor(v)  }} style={{ flex: 1, paddingVertical: 20 }}>
+                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
+                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>{v.name} | {v.total_capacity}</Text>
+                                    </View>
+                                </TouchableRipple>
+                            </View>
 
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: 200, height: 150 }}>
-                                <TouchableRipple onPress={() => { setScreen(2); setAvailableScreens(2) }} style={{ flex: 1, paddingVertical: 20 }}>
-                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
-                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>Living Room</Text>
-                                    </View>
-                                </TouchableRipple>
-                            </View>
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: 200, height: 150 }}>
-                                <TouchableRipple onPress={() => { setScreen(2); setAvailableScreens(2) }} style={{ flex: 1, paddingVertical: 20 }}>
-                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
-                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>Storage</Text>
-                                    </View>
-                                </TouchableRipple>
-                            </View>
+                                )
+                            })}
+                            
                         </Surface>
                     }
                     {screen == 2 &&
                         <Surface elevation={0} style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, justifyContent: "space-between", rowGap: 20, paddingHorizontal: 10, }}>
+                            {availableBrands?.map((v)=>{
+                                return(
+                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", paddingVertical:20 }}>
+                                <TouchableRipple onPress={() => { select_brand(v) }} style={{ flex: 1, paddingVertical: 20 }}>
+                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
+                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>{v.name}</Text>
+                                    </View>
+                                </TouchableRipple>
+                            </View>
 
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: 200, height: 150 }}>
-                                <TouchableRipple onPress={() => { setScreen(3); setAvailableScreens(3) }} style={{ flex: 1, paddingVertical: 20 }}>
-                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
-                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>Cohiba</Text>
-                                    </View>
-                                </TouchableRipple>
-                            </View>
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: 200, height: 150 }}>
-                                <TouchableRipple onPress={() => { setScreen(3); setAvailableScreens(3) }} style={{ flex: 1, paddingVertical: 20 }}>
-                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
-                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>Romeo & Juliette</Text>
-                                    </View>
-                                </TouchableRipple>
-                            </View>
+                                )
+                            })}
+                            
                         </Surface>
                     }
                     {screen == 3 &&
                         <Surface elevation={0} style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, justifyContent: "space-between", rowGap: 20, paddingHorizontal: 10, }}>
+                            {availableCigars?.map((v)=>{
+                                return(
+                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", paddingVertical:20 }}>
+                                <TouchableRipple onPress={() => { setScreen(4); setAvailableScreens(4) }} style={{ flex: 1, paddingVertical: 20 }}>
+                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
+                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>{v.name}</Text>
+                                    </View>
+                                </TouchableRipple>
+                            </View>
 
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: 200, height: 150 }}>
-                                <TouchableRipple onPress={() => { setScreen(4); setAvailableScreens(4) }} style={{ flex: 1, paddingVertical: 20 }}>
-                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
-                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>Ciglo 1</Text>
-                                    </View>
-                                </TouchableRipple>
-                            </View>
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: 200, height: 150 }}>
-                                <TouchableRipple onPress={() => { setScreen(4); setAvailableScreens(4) }} style={{ flex: 1, paddingVertical: 20 }}>
-                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
-                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>Ciglo 2</Text>
-                                    </View>
-                                </TouchableRipple>
-                            </View>
+                                )
+                            })}
+                            
                         </Surface>
                     }
                     {screen == 4 &&
@@ -226,7 +319,7 @@ export default function AddHistory() {
                                     {/* 3213/43/432</Button> */}
                                     {String(date.getDate()).padStart(2, '0') + "/" + String(date.getMonth() + 1).padStart(2, '0') + "/" + date.getFullYear()} </Button>
                             </View>
-                            <TouchableRipple onPress={() => { setchecker(!checker) }} style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 12 }}>
+                            <TouchableRipple onPress={() => { setchecker(!checker); Vibration.vibrate([0,2,0,5,0,10]) }} style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 12 }}>
                                 <react.Fragment>
                                     <View style={{ flexDirection: "row", rowGap: 4, alignItems: "center" }} >
                                         <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 20 }}>
@@ -234,7 +327,7 @@ export default function AddHistory() {
                                         </Text>
                                     </View>
                                     <View pointerEvents="none">
-                                        <Switch value={checker} />
+                                        <Switch value={checker}  />
                                     </View>
                                 </react.Fragment>
                             </TouchableRipple>
@@ -260,22 +353,31 @@ export default function AddHistory() {
                                         Rate out of 10
                                     </Text>
                                 </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 12 }}>
-                                    <View style={{ flexDirection: "row", rowGap: 4 }} >
-                                        <Text style={{ color: "#666", fontWeight: "700", opacity: 0, fontSize: 20 }}>
-                                            Comment
-                                        </Text>
-                                    </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between",  marginBottom: 12 }}>
+                    
                                     <View
-                                        style={{  flex: 1, marginLeft: 20 }}
+                                        style={{  flex: 1,  marginTop:20 }}
                                     >
                                         <Slider
                                             // style={styles.container}
+                                            thumbWidth={40}
+                                            sliderHeight={20}
+                                            style={{ borderRadius:25}}
+                                            // markStyle={{backgroundColor:"#456123"}}
+                                            containerStyle={{borderRadius:25, margin:20}}
+                                            bubbleContainerStyle={{marginTop:-25}}
+                                            theme={{bubbleBackgroundColor:theme.colors.secondary,  maximumTrackTintColor:theme.colors.outlineVariant, minimumTrackTintColor:theme.colors.secondary, }}
                                             step={10}
                                             progress={progress}
                                             minimumValue={min}
                                             maximumValue={max}
-                                        />
+                                            onValueChange={(r:number)=>{}}
+                                            hapticMode="step"
+                                            onHapticFeedback={() => {
+                                                Vibration.vibrate([50,5,50,5])
+                                              }                                        
+                                            }
+                                              />
 
                                     </View>
                                 </View>

@@ -76,12 +76,16 @@ export interface DbCigar{
 
 export interface DbHistory {
     id:number;
-    cigar:ICigar;
-    date_used:Date;
+    cigar_id:number;
+    library_id:number;
+    date_used:string;
     rate:string;
-    comment:string;
-    self_used:boolean
+    comment:string
+    self_used:number
 }
+    
+    
+    
 
 
 export interface IStorageSettings{
