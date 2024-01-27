@@ -80,8 +80,9 @@ export interface DbHistory {
     library_id:number;
     date_used:string;
     rate:string;
-    comment:string
-    self_used:number
+    comment:string;
+    self_used:number;
+    total:number
 }
     
     

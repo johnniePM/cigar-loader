@@ -34,6 +34,8 @@ export default function AddHistory() {
     const [selectedBrand, setSelectedBrand]=useState<DbBrand>()
     const [availableBrands, setAvailableBrands]=useState<Array<DbBrand>>()
     const [availableCigars, setAvailableCigars]=useState<Array<DbCigar>>()
+    const [selectedCigar, setSelectedCigar]=useState<DbCigar>()
+    const [selectedGroup, setSelectedGroup]=useState<DbLibrary>()
     const [availableLibrary, setAvailableLibrary]=useState<Array<DbLibrary>>()
     const [History, setHistory]=useState<DbHistory>({
         cigar_id:NaN,
@@ -42,7 +44,8 @@ export default function AddHistory() {
         library_id:NaN,
         rate:"5",
         self_used:1,
-        id:NaN
+        id:NaN,
+        total:0
     })
     const progress = useSharedValue(5);
     const min = useSharedValue(0);
@@ -134,6 +137,36 @@ export default function AddHistory() {
             setAvailableScreens(3)
         })
 
+
+
+    }
+    const select_cigar=(v:DbCigar)=>{
+        
+        const library_items:DbLibrary[]=database.LibraryList
+        setAvailableLibrary(library_items.filter((e)=>{return e.humidor_id==selectedHumidor.id && e.total_number>0&&e.cigar_id==v.id }))
+        // console.log(library_items)
+        // (library_items)
+        setSelectedCigar(v)
+        setScreen(4);
+        setAvailableScreens(4)
+
+    
+
+
+    }
+    const select_group=(v:DbLibrary)=>{
+        
+        
+        // setAvailableLibrary(library_items.filter((e)=>{return e.humidor_id==selectedHumidor.id && e.total_number>0&&e.cigar_id==v.id }))
+        // console.log(library_items)
+        // (library_items)
+        // setSelectedCigar(v)
+        setSelectedGroup(v)
+        setHistory(prevstate=>({...prevstate,cigar_id:v.cigar_id }))
+        setScreen(5);
+        setAvailableScreens(5 )
+
+    
 
 
     }
@@ -263,7 +296,7 @@ export default function AddHistory() {
                             {availableCigars?.map((v)=>{
                                 return(
                             <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", paddingVertical:20 }}>
-                                <TouchableRipple onPress={() => { setScreen(4); setAvailableScreens(4) }} style={{ flex: 1, paddingVertical: 20 }}>
+                                <TouchableRipple onPress={() => { select_cigar(v) }} style={{ flex: 1, paddingVertical: 20 }}>
                                     <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
                                         <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>{v.name}</Text>
                                     </View>
@@ -277,35 +310,29 @@ export default function AddHistory() {
                     }
                     {screen == 4 &&
                         <Surface elevation={0} style={{ flex: 1, rowGap: 20, paddingHorizontal: 10, }}>
+                            {availableLibrary?.map((v,e)=>{
+                                return(
 
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", height: 100 }}>
-                                <TouchableRipple onPress={() => { setScreen(5); setAvailableScreens(5) }} style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 20 }}>
+                            <View key={e} style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", height: 100 }}>
+                                <TouchableRipple onPress={() => {select_group(v) }} style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 20 }}>
                                     <View style={{ flexDirection: "row", justifyContent: "space-between", flex: 1, alignItems: "center" }}>
                                         <View style={{ justifyContent: "space-between", height: "100%" }}>
-                                            <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Name: Ciglo 1</Text>
-                                            <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Date added: 21/11/2023</Text>
+                                            <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Name: {selectedCigar?.name}</Text>
+                                            <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Date added: {new Date( v.date_added).getDay()+"/"+(new Date(v.date_added).getMonth()+1)+"/"+new Date(v.date_added).getFullYear()}</Text>
                                         </View>
-                                        <Text style={{ color: theme.colors.onPrimary }} variant="headlineSmall" numberOfLines={1}>Total 15</Text>
+                                        <Text style={{ color: theme.colors.onPrimary }} variant="headlineSmall" numberOfLines={1}>Total {v.total_number}</Text>
                                     </View>
                                 </TouchableRipple>
                             </View>
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", height: 100 }}>
-                                <TouchableRipple onPress={() => { setScreen(5); setAvailableScreens(5) }} style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 20 }}>
-                                    <View style={{ flexDirection: "row", justifyContent: "space-between", flex: 1, alignItems: "center" }}>
-                                        <View style={{ justifyContent: "space-between", height: "100%" }}>
-                                            <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Name: Ciglo 1</Text>
-                                            <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Date added: 21/11/2023</Text>
-                                        </View>
-                                        <Text style={{ color: theme.colors.onPrimary }} variant="headlineSmall" numberOfLines={1}>Total 15</Text>
-                                    </View>
-                                </TouchableRipple>
-                            </View>
+                                )
+                            })}
+                           
 
                         </Surface>
                     }
                     {screen == 5 &&
                         <Surface elevation={0} style={{ flex: 1, rowGap: 20, paddingHorizontal: 10, }}>
-                            <CounterComponent left={"Smoked Cigar Number"} number={number} increase={() => { setNumber(number + 1) }} decrease={() => { number == 0 ? null : setNumber(number - 1) }} />
+                        <CounterComponent left={"Smoked Cigar Number"} number={History.total} increase={() => {selectedGroup?.total_number!=undefined? selectedGroup?.total_number>History.total? setHistory(prev=>({...prev, total:History.total+1})):null:null }} decrease={() => { History.total>0? setHistory(prev=>({...prev, total:History.total-1})):null }} />
                             <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 12 }}>
 
                                 <View style={{ flexDirection: "row", rowGap: 4, alignItems: "center" }} >
@@ -319,7 +346,7 @@ export default function AddHistory() {
                                     {/* 3213/43/432</Button> */}
                                     {String(date.getDate()).padStart(2, '0') + "/" + String(date.getMonth() + 1).padStart(2, '0') + "/" + date.getFullYear()} </Button>
                             </View>
-                            <TouchableRipple onPress={() => { setchecker(!checker); Vibration.vibrate([0,2,0,5,0,10]) }} style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 12 }}>
+                            <TouchableRipple onPress={() => { setHistory((prev)=>({...prev, self_used:History.self_used==0?1:0})); Vibration.vibrate([0,2,0,5,0,10]) }} style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 12 }}>
                                 <react.Fragment>
                                     <View style={{ flexDirection: "row", rowGap: 4, alignItems: "center" }} >
                                         <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 20 }}>
@@ -327,7 +354,7 @@ export default function AddHistory() {
                                         </Text>
                                     </View>
                                     <View pointerEvents="none">
-                                        <Switch value={checker}  />
+                                        <Switch value={History.self_used==1}  />
                                     </View>
                                 </react.Fragment>
                             </TouchableRipple>
@@ -371,7 +398,7 @@ export default function AddHistory() {
                                             progress={progress}
                                             minimumValue={min}
                                             maximumValue={max}
-                                            onValueChange={(r:number)=>{}}
+                                            onValueChange={(r:number)=>{setHistory((prev=>({...prev, rate:String(r)})))}}
                                             hapticMode="step"
                                             onHapticFeedback={() => {
                                                 Vibration.vibrate([50,5,50,5])
