@@ -6,7 +6,7 @@ import { ReactNode } from "react"
 export interface IUseDatabase {
     add_to_brand: (brand?: IBrand) => Promise<number>;
     add_to_cigar: (cigar?: DbCigar) => Promise<number | undefined>;
-    add_to_history: (history?: IHistory) => Promise<number | undefined>;
+    add_to_history: (history?: DbHistory) => Promise<number | undefined>;
     add_to_humidor: (humidor?: DbHumidor) => Promise<number | undefined>;
     add_to_library: (library?: DbLibrary) => Promise<number | undefined>;
     edit_table: (table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number, update: DbUpdate) => void;

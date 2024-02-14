@@ -14,3 +14,18 @@ export function date_datify(the_string:string):Date{
     return date
 
 }
+
+export function is_dateable(the_string:string):boolean{
+    const d=new Date(parseInt(the_string.slice(0,4)),parseInt(the_string.slice(4,6))-1,parseInt(the_string.slice(6,8)))
+    // console.log(the_string.slice(0,4))
+    // console.log(the_string.slice(4,6))
+    // console.log(the_string.slice(6,8))
+    
+    if (isNaN(d.getMonth())) {
+        return false
+     }
+     else
+     {
+        return true
+     }
+}

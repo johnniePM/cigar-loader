@@ -402,7 +402,7 @@ export default function Home() {
             </ScreenWrapper>
 
             <FAB.Group
-                backdropColor={theme.colors.elevation.level2.replace(")", ", 128)")}
+                backdropColor={theme.colors.elevation.level2.replace(")", ",128)")}
                 
                 open={open}
                 label={!open ? settings.QuickAdd : "ScaleDown"}
