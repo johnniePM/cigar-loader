@@ -1,5 +1,5 @@
 import { GestureResponderEvent, LayoutAnimation, StyleSheet, View, ScrollView, Dimensions, Image, Animated as ReactAnimated } from "react-native";
-import { Avatar, Button, Card, Chip, Divider, Drawer, FAB, List, Menu, Portal, Searchbar, Surface, Text, useTheme } from "react-native-paper";
+import { Avatar, Button, Card, Chip, Divider, Drawer, FAB, List, MD3Colors, Menu, Portal, Searchbar, Surface, Text, useTheme } from "react-native-paper";
 import ScreenWrapper from "../components/ScreenWrapper";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSettings } from "../hooks/UseSettings";
@@ -402,19 +402,22 @@ export default function Home() {
             </ScreenWrapper>
 
             <FAB.Group
-                backdropColor={theme.colors.elevation.level2.replace(")", ", 11)")}
+                backdropColor={theme.colors.elevation.level2.replace(")", ", 128)")}
+                
                 open={open}
                 label={!open ? settings.QuickAdd : "ScaleDown"}
                 icon={open ? 'minus' : 'plus'}
                 actions={[
 
-                    { icon: 'cigar', label: 'Add new cigar', onPress: () => { navigation.navigate("AddCigar")} },
-                    { icon: 'dresser-outline', label: 'Add New Humidor', onPress: () => { navigation.navigate("AddHumidor") } },
+                    { icon: 'cigar', label: 'Add new cigar', onPress: () => { navigation.navigate("AddCigar")}, labelTextColor:"#ffffff" },
+                    { icon: 'dresser-outline', label: 'Add New Humidor', onPress: () => { navigation.navigate("AddHumidor") }, labelTextColor:"#ffffff" },
                     {
                         icon: 'content-save-edit',
                         label: 'Report Smoking a Cigar',
                         onPress: () => {navigation.navigate("AddHistory") },
                         size: theme.isV3 ? 'small' : 'medium',
+                        labelTextColor:"#ffffff",
+
                     },
                 ]}
                 onStateChange={({ open }: { open: boolean }) => { !open ? setOpen(false) : null }}

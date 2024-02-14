@@ -17,7 +17,7 @@ function CounterComponent({
 
           <View style={{ flexDirection: "row", justifyContent: "space-between",  alignItems: "center", paddingHorizontal: 16, marginBottom: 12, flexWrap:"wrap" }}>
             <View style={{ flexDirection: "row", alignItems: "center", rowGap: 4, justifyContent:"flex-start", alignSelf:"center" }} >
-              <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 20 }}>
+              <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 18 }}>
                 {left}
               </Text>
             </View>
@@ -26,11 +26,11 @@ function CounterComponent({
               style={{ flexDirection: "row", alignItems: "center", columnGap: 16, borderWidth: 1, borderColor: "#555", borderRadius: 200, padding: 4, paddingHorizontal: 16, justifyContent:"flex-end" }}
             >
               <TouchableOpacity onPress={()=>{decrease?decrease():null}}>
-                <Ionicons name='remove' size={30} color={"#333"} />
+                <Ionicons name='remove' size={16} color={"#333"} />
               </TouchableOpacity>
-              <Text style={{ color: "#333", fontWeight: "bold", fontSize: 24 }} >{number}</Text>
+              <Text style={{ color: "#333", fontWeight: "bold", fontSize: 16 }} >{number}</Text>
               <TouchableOpacity onPress={()=>{increase?increase():null}}>
-                <Ionicons size={30} name='add' color={"#333"} />
+                <Ionicons size={16} name='add' color={"#333"} />
               </TouchableOpacity>
             </View>
           </View>

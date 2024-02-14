@@ -1,6 +1,6 @@
 import react, { useState, useEffect, useRef, Ref, createRef } from "react"
 import { Appbar, Chip, Surface, Text, TouchableRipple, TouchableRippleProps, useTheme, TextInput, Button, RadioButton, Switch } from "react-native-paper";
-import { SafeAreaView, View, LayoutAnimation, Pressable, ScrollView , VibrationStatic, Vibration} from "react-native";
+import { SafeAreaView, View, LayoutAnimation, Pressable, ScrollView, VibrationStatic, Vibration } from "react-native";
 import Animated, {
     useSharedValue,
     withTiming,
@@ -30,22 +30,22 @@ export default function AddHistory() {
     const [number, setNumber] = useState<number>(0)
     const [date, setDate] = useState<Date>(new Date())
     const [checker, setchecker] = useState<boolean>(true)
-    const [selectedHumidor, setSelectedHumidor]=useState<DbHumidor>({id:NaN, name:"", total_capacity:"0"})
-    const [selectedBrand, setSelectedBrand]=useState<DbBrand>()
-    const [availableBrands, setAvailableBrands]=useState<Array<DbBrand>>()
-    const [availableCigars, setAvailableCigars]=useState<Array<DbCigar>>()
-    const [selectedCigar, setSelectedCigar]=useState<DbCigar>()
-    const [selectedGroup, setSelectedGroup]=useState<DbLibrary>()
-    const [availableLibrary, setAvailableLibrary]=useState<Array<DbLibrary>>()
-    const [History, setHistory]=useState<DbHistory>({
-        cigar_id:NaN,
-        comment:"",
-        date_used:"",
-        library_id:NaN,
-        rate:"5",
-        self_used:1,
-        id:NaN,
-        total:0
+    const [selectedHumidor, setSelectedHumidor] = useState<DbHumidor>({ id: NaN, name: "", total_capacity: "0" })
+    const [selectedBrand, setSelectedBrand] = useState<DbBrand>()
+    const [availableBrands, setAvailableBrands] = useState<Array<DbBrand>>()
+    const [availableCigars, setAvailableCigars] = useState<Array<DbCigar>>()
+    const [selectedCigar, setSelectedCigar] = useState<DbCigar>()
+    const [selectedGroup, setSelectedGroup] = useState<DbLibrary>()
+    const [availableLibrary, setAvailableLibrary] = useState<Array<DbLibrary>>()
+    const [History, setHistory] = useState<DbHistory>({
+        cigar_id: NaN,
+        comment: "",
+        date_used: "",
+        library_id: NaN,
+        rate: "5",
+        self_used: 1,
+        id: NaN,
+        total: 0
     })
     const progress = useSharedValue(5);
     const min = useSharedValue(0);
@@ -63,62 +63,63 @@ export default function AddHistory() {
         }
     };
 
-    const select_humidor=(v:DbHumidor)=>{
+    const select_humidor = (v: DbHumidor) => {
         setSelectedHumidor(v)
-        const library_items:DbLibrary[]=database.LibraryList
-        library_items.filter((e)=>{return(e.humidor_id==v.id && e.total_number>0)})
+        const library_items: DbLibrary[] = database.LibraryList
+        library_items.filter((e) => { return (e.humidor_id == v.id && e.total_number > 0) })
         setAvailableLibrary(library_items)
-        const cigar_ids:Array<number>=library_items.reduce((accumulator:Array<number>, currentItem) => {
+        const cigar_ids: Array<number> = library_items.reduce((accumulator: Array<number>, currentItem) => {
             // Assuming currentItem has a property called cigar_id
             const cigarId: number = currentItem.cigar_id;
-        
+
             // Check if the cigar_id is not already in the accumulator array
-            if (!accumulator.includes(cigarId)) {
+            const  checkCigarInHumidor:boolean=library_items.some((v)=>cigarId==v.cigar_id) 
+            if (!accumulator.includes(cigarId) &&  checkCigarInHumidor) {
                 // If not, add it to the accumulator array
                 accumulator.push(cigarId);
             }
-        
+
             return accumulator;
         }, []);
-        database.async_select_from_table("Cigar", cigar_ids, "id").then((cigar_list)=>{
-            if (checkIsCigar(cigar_list)){
+        database.async_select_from_table("Cigar", cigar_ids, "id").then((cigar_list) => {
+            if (checkIsCigar(cigar_list)) {
                 setAvailableCigars(cigar_list)
                 return cigar_list
             }
-        }).then((cigar_list)=>{
-            if (cigar_list!=undefined){
-                const brand_id:Array<number>=cigar_list.reduce((accumulator:Array<number>, currentItem) => {
+        }).then((cigar_list) => {
+            if (cigar_list != undefined) {
+                const brand_id: Array<number> = cigar_list.reduce((accumulator: Array<number>, currentItem) => {
                     // Assuming currentItem has a property called cigar_id
                     const cigarId: number = currentItem.brand_id;
-                
+
                     // Check if the cigar_id is not already in the accumulator array
                     if (!accumulator.includes(cigarId)) {
                         // If not, add it to the accumulator array
                         accumulator.push(cigarId);
                     }
-                
+
                     return accumulator;
                 }, []);
                 return database.async_select_from_table("Brand", brand_id, "id")
             }
-        }).then((brand_list)=>{
-            if(brand_list!=undefined&& checkIsBrand(brand_list)){
+        }).then((brand_list) => {
+            if (brand_list != undefined && checkIsBrand(brand_list)) {
                 setAvailableBrands(brand_list)
                 // setAvailableBrands(brand_list)
             }
-        }).finally(()=>{
+        }).finally(() => {
             setScreen(2); setAvailableScreens(2);
         })
 
 
 
     }
-    const select_brand=(v:DbBrand)=>{
+    const select_brand = (v: DbBrand) => {
         setSelectedBrand(v)
-        const library_items:DbLibrary[]=database.LibraryList
-        library_items.filter((e)=>{return(e.humidor_id==selectedHumidor.id && e.total_number>0)})
+        const library_items: DbLibrary[] = database.LibraryList
+        library_items.filter((e) => { return (e.humidor_id == selectedHumidor.id && e.total_number > 0) })
         setAvailableLibrary(library_items)
-        const cigar_ids:Array<number>=library_items.reduce((accumulator:Array<number>, currentItem) => {
+        const cigar_ids: Array<number> = library_items.reduce((accumulator: Array<number>, currentItem) => {
             const cigarId: number = currentItem.cigar_id;
             if (!accumulator.includes(cigarId)) {
                 accumulator.push(cigarId);
@@ -126,13 +127,13 @@ export default function AddHistory() {
             return accumulator;
         }, []);
 
-        database.async_select_from_table("Cigar", cigar_ids, "id").then((cigar_list)=>{
-            if (checkIsCigar(cigar_list)){
-                cigar_list=cigar_list.filter((i)=>i.brand_id==v.id)
+        database.async_select_from_table("Cigar", cigar_ids, "id").then((cigar_list) => {
+            if (checkIsCigar(cigar_list)) {
+                cigar_list = cigar_list.filter((i) => i.brand_id == v.id)
                 setAvailableCigars(cigar_list)
                 return cigar_list
             }
-        }).finally(()=>{
+        }).finally(() => {
             setScreen(3);
             setAvailableScreens(3)
         })
@@ -140,33 +141,33 @@ export default function AddHistory() {
 
 
     }
-    const select_cigar=(v:DbCigar)=>{
-        
-        const library_items:DbLibrary[]=database.LibraryList
-        setAvailableLibrary(library_items.filter((e)=>{return e.humidor_id==selectedHumidor.id && e.total_number>0&&e.cigar_id==v.id }))
+    const select_cigar = (v: DbCigar) => {
+
+        const library_items: DbLibrary[] = database.LibraryList
+        setAvailableLibrary(library_items.filter((e) => { return e.humidor_id == selectedHumidor.id && e.total_number > 0 && e.cigar_id == v.id }))
         // console.log(library_items)
         // (library_items)
         setSelectedCigar(v)
         setScreen(4);
         setAvailableScreens(4)
 
-    
+
 
 
     }
-    const select_group=(v:DbLibrary)=>{
-        
-        
+    const select_group = (v: DbLibrary) => {
+
+
         // setAvailableLibrary(library_items.filter((e)=>{return e.humidor_id==selectedHumidor.id && e.total_number>0&&e.cigar_id==v.id }))
         // console.log(library_items)
         // (library_items)
         // setSelectedCigar(v)
         setSelectedGroup(v)
-        setHistory(prevstate=>({...prevstate,cigar_id:v.cigar_id }))
+        setHistory(prevstate => ({ ...prevstate, cigar_id: v.cigar_id, library_id:v.id }))
         setScreen(5);
-        setAvailableScreens(5 )
+        setAvailableScreens(5)
 
-    
+
 
 
     }
@@ -191,6 +192,9 @@ export default function AddHistory() {
 
 
     }, [])
+    useEffect(() => {
+        console.log(History)
+    }, [History])
 
     if (availableScreens == 0) {
 
@@ -259,84 +263,84 @@ export default function AddHistory() {
                     </ScrollView>
                     {screen == 1 &&
                         <Surface elevation={0} style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, justifyContent: "space-between", rowGap: 20, paddingHorizontal: 10, }}>
-                            {database.HumidorList.map((v)=>{
-                                return(
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", paddingVertical:20 }}>
-                                <TouchableRipple onPress={() => {  select_humidor(v)  }} style={{ flex: 1, paddingVertical: 20 }}>
-                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
-                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>{v.name} | {v.total_capacity}</Text>
+                            {database.HumidorList.map((v) => {
+                                return (
+                                    <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", paddingVertical: 20 }}>
+                                        <TouchableRipple onPress={() => { select_humidor(v) }} style={{ flex: 1, paddingVertical: 20 }}>
+                                            <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
+                                                <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>{v.name} | {v.total_capacity}</Text>
+                                            </View>
+                                        </TouchableRipple>
                                     </View>
-                                </TouchableRipple>
-                            </View>
 
                                 )
                             })}
-                            
+
                         </Surface>
                     }
                     {screen == 2 &&
                         <Surface elevation={0} style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, justifyContent: "space-between", rowGap: 20, paddingHorizontal: 10, }}>
-                            {availableBrands?.map((v)=>{
-                                return(
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", paddingVertical:20 }}>
-                                <TouchableRipple onPress={() => { select_brand(v) }} style={{ flex: 1, paddingVertical: 20 }}>
-                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
-                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>{v.name}</Text>
+                            {availableBrands?.map((v) => {
+                                return (
+                                    <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", paddingVertical: 20 }}>
+                                        <TouchableRipple onPress={() => { select_brand(v) }} style={{ flex: 1, paddingVertical: 20 }}>
+                                            <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
+                                                <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>{v.name}</Text>
+                                            </View>
+                                        </TouchableRipple>
                                     </View>
-                                </TouchableRipple>
-                            </View>
 
                                 )
                             })}
-                            
+
                         </Surface>
                     }
                     {screen == 3 &&
                         <Surface elevation={0} style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, justifyContent: "space-between", rowGap: 20, paddingHorizontal: 10, }}>
-                            {availableCigars?.map((v)=>{
-                                return(
-                            <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", paddingVertical:20 }}>
-                                <TouchableRipple onPress={() => { select_cigar(v) }} style={{ flex: 1, paddingVertical: 20 }}>
-                                    <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
-                                        <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>{v.name}</Text>
+                            {availableCigars?.map((v) => {
+                                return (
+                                    <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", paddingVertical: 20 }}>
+                                        <TouchableRipple onPress={() => { select_cigar(v) }} style={{ flex: 1, paddingVertical: 20 }}>
+                                            <View style={{ alignContent: "center", justifyContent: "center", alignItems: "center", alignSelf: "center", flex: 1 }}>
+                                                <Text style={{ color: theme.colors.onPrimary, textAlign: "center" }} variant="titleLarge" numberOfLines={1}>{v.name}</Text>
+                                            </View>
+                                        </TouchableRipple>
                                     </View>
-                                </TouchableRipple>
-                            </View>
 
                                 )
                             })}
-                            
+
                         </Surface>
                     }
                     {screen == 4 &&
                         <Surface elevation={0} style={{ flex: 1, rowGap: 20, paddingHorizontal: 10, }}>
-                            {availableLibrary?.map((v,e)=>{
-                                return(
+                            {availableLibrary?.map((v, e) => {
+                                return (
 
-                            <View key={e} style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", height: 100 }}>
-                                <TouchableRipple onPress={() => {select_group(v) }} style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 20 }}>
-                                    <View style={{ flexDirection: "row", justifyContent: "space-between", flex: 1, alignItems: "center" }}>
-                                        <View style={{ justifyContent: "space-between", height: "100%" }}>
-                                            <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Name: {selectedCigar?.name}</Text>
-                                            <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Date added: {new Date( v.date_added).getDay()+"/"+(new Date(v.date_added).getMonth()+1)+"/"+new Date(v.date_added).getFullYear()}</Text>
-                                        </View>
-                                        <Text style={{ color: theme.colors.onPrimary }} variant="headlineSmall" numberOfLines={1}>Total {v.total_number}</Text>
+                                    <View key={e} style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", width: "100%", height: 100 }}>
+                                        <TouchableRipple onPress={() => { select_group(v) }} style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 20 }}>
+                                            <View style={{ flexDirection: "row", justifyContent: "space-between", flex: 1, alignItems: "center" }}>
+                                                <View style={{ justifyContent: "space-between", height: "100%" }}>
+                                                    <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Name: {selectedCigar?.name}</Text>
+                                                    <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Date added: {new Date(v.date_added).getDay() + "/" + (new Date(v.date_added).getMonth() + 1) + "/" + new Date(v.date_added).getFullYear()}</Text>
+                                                </View>
+                                                <Text style={{ color: theme.colors.onPrimary }} variant="headlineSmall" numberOfLines={1}>Total {v.total_number}</Text>
+                                            </View>
+                                        </TouchableRipple>
                                     </View>
-                                </TouchableRipple>
-                            </View>
                                 )
                             })}
-                           
+
 
                         </Surface>
                     }
                     {screen == 5 &&
                         <Surface elevation={0} style={{ flex: 1, rowGap: 20, paddingHorizontal: 10, }}>
-                        <CounterComponent left={"Smoked Cigar Number"} number={History.total} increase={() => {selectedGroup?.total_number!=undefined? selectedGroup?.total_number>History.total? setHistory(prev=>({...prev, total:History.total+1})):null:null }} decrease={() => { History.total>0? setHistory(prev=>({...prev, total:History.total-1})):null }} />
+                            <CounterComponent left={"Smoked Cigar Number"} number={History.total} increase={() => { selectedGroup?.total_number != undefined ? selectedGroup?.total_number > History.total ? setHistory(prev => ({ ...prev, total: History.total + 1 })) : null : null }} decrease={() => { History.total > 0 ? setHistory(prev => ({ ...prev, total: History.total - 1 })) : null }} />
                             <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 12 }}>
 
                                 <View style={{ flexDirection: "row", rowGap: 4, alignItems: "center" }} >
-                                    <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 20 }}>
+                                    <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 18 }}>
                                         Select Date
                                     </Text>
                                 </View>
@@ -346,29 +350,29 @@ export default function AddHistory() {
                                     {/* 3213/43/432</Button> */}
                                     {String(date.getDate()).padStart(2, '0') + "/" + String(date.getMonth() + 1).padStart(2, '0') + "/" + date.getFullYear()} </Button>
                             </View>
-                            <TouchableRipple onPress={() => { setHistory((prev)=>({...prev, self_used:History.self_used==0?1:0})); Vibration.vibrate([0,2,0,5,0,10]) }} style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 12 }}>
+                            <TouchableRipple onPress={() => { setHistory((prev) => ({ ...prev, self_used: History.self_used == 0 ? 1 : 0 })); Vibration.vibrate([0, 2, 0, 5, 0, 10]) }} style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 12 }}>
                                 <react.Fragment>
                                     <View style={{ flexDirection: "row", rowGap: 4, alignItems: "center" }} >
-                                        <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 20 }}>
+                                        <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 18 }}>
                                             Is it Smoked By You
                                         </Text>
                                     </View>
                                     <View pointerEvents="none">
-                                        <Switch value={History.self_used==1}  />
+                                        <Switch value={History.self_used == 1} />
                                     </View>
                                 </react.Fragment>
                             </TouchableRipple>
 
                             <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 12 }}>
                                 <View style={{ flexDirection: "row", rowGap: 4 }} >
-                                    <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 20 }}>
+                                    <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 18 }}>
                                         Comment
                                     </Text>
                                 </View>
                                 <View
                                     style={{ borderRadius: 200, flex: 1, marginLeft: 20 }}
                                 >
-                                    <TextInput placeholder="Write Your Comment Here..." multiline mode="outlined" outlineStyle={{ backgroundColor: "#00000000", borderRadius: 40, padding: 20, flex: 1, minHeight: 250 }} contentStyle={{ minHeight: 250 }} style={{ minHeight: 250, paddingVertical: 20 }} outlineColor="#555" />
+                                    <TextInput onChangeText={(e) => { setHistory((prev => ({ ...prev, comment: e }))) }} placeholder="Write Your Comment Here..." multiline mode="outlined" outlineStyle={{ backgroundColor: "#00000000", borderRadius: 40, padding: 20, flex: 1, minHeight: 250 }} contentStyle={{ minHeight: 250 }} style={{ minHeight: 250, paddingVertical: 20 }} outlineColor="#555" />
 
 
                                 </View>
@@ -376,39 +380,49 @@ export default function AddHistory() {
 
                             <View style={{ width: "100%", paddingHorizontal: 16, marginBottom: 12 }}>
                                 <View style={{ flexDirection: "row", rowGap: 4, paddingBottom: 16 }} >
-                                    <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 20 }}>
+                                    <Text style={{ color: "#666", fontWeight: "700", opacity: 0.6, fontSize: 18 }}>
                                         Rate out of 10
                                     </Text>
                                 </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between",  marginBottom: 12 }}>
-                    
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 12 }}>
+
                                     <View
-                                        style={{  flex: 1,  marginTop:20 }}
+                                        style={{ flex: 1, marginTop: 20 }}
                                     >
                                         <Slider
                                             // style={styles.container}
                                             thumbWidth={40}
                                             sliderHeight={20}
-                                            style={{ borderRadius:25}}
+                                            style={{ borderRadius: 25 }}
                                             // markStyle={{backgroundColor:"#456123"}}
-                                            containerStyle={{borderRadius:25, margin:20}}
-                                            bubbleContainerStyle={{marginTop:-25}}
-                                            theme={{bubbleBackgroundColor:theme.colors.secondary,  maximumTrackTintColor:theme.colors.outlineVariant, minimumTrackTintColor:theme.colors.secondary, }}
+                                            containerStyle={{ borderRadius: 25, margin: 20 }}
+                                            bubbleContainerStyle={{ marginTop: -25 }}
+                                            theme={{ bubbleBackgroundColor: theme.colors.secondary, maximumTrackTintColor: theme.colors.outlineVariant, minimumTrackTintColor: theme.colors.secondary, }}
                                             step={10}
                                             progress={progress}
                                             minimumValue={min}
                                             maximumValue={max}
-                                            onValueChange={(r:number)=>{setHistory((prev=>({...prev, rate:String(r)})))}}
+                                            onSlidingComplete={(r: number) => { setHistory((prev => ({ ...prev, rate: String(r) }))) }}
+                                            // onSlidingComplete={()}
                                             hapticMode="step"
                                             onHapticFeedback={() => {
-                                                Vibration.vibrate([50,5,50,5])
-                                              }                                        
+                                                Vibration.vibrate([50, 5, 50, 5])
                                             }
-                                              />
+                                            }
+                                        />
 
                                     </View>
                                 </View>
 
+                            </View>
+                            <View style={{flex:1, flexDirection:"row-reverse", marginBottom:20}}>
+                                <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", }}>
+                                    <TouchableRipple onPress={() => { }} style={{ flex: 1, paddingVertical: 15, paddingHorizontal: 50 }}>
+                                        <View>
+                                            <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Report </Text>
+                                        </View>
+                                    </TouchableRipple>
+                                </View>
                             </View>
                         </Surface>
                     }
