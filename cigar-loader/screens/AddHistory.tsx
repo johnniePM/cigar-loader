@@ -10,7 +10,7 @@ import ScreenWrapper from "../components/ScreenWrapper";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/StackNav";
-import { Camera } from "expo-camera";
+import { Camera, CameraType } from "expo-camera";
 import CounterComponent from '../components/Counter';
 import { DateTimePickerAndroid, DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
@@ -83,7 +83,6 @@ export default function AddHistory() {
 
             return accumulator;
         }, []);
-        console.log(cigar_ids)
         database.async_select_from_table("Cigar", cigar_ids, "id").then((cigar_list) => {
             if (checkIsCigar(cigar_list)) {
                 setAvailableCigars(cigar_list)
@@ -148,7 +147,7 @@ export default function AddHistory() {
 
         const library_items: DbLibrary[] = database.LibraryList
         setAvailableLibrary(library_items.filter((e) => { return e.humidor_id == selectedHumidor.id && e.total_number > 0 && e.cigar_id == v.id }))
-        // console.log(library_items)
+    
         // (library_items)
         setSelectedCigar(v)
         setScreen(4);
@@ -162,7 +161,7 @@ export default function AddHistory() {
 
 
         // setAvailableLibrary(library_items.filter((e)=>{return e.humidor_id==selectedHumidor.id && e.total_number>0&&e.cigar_id==v.id }))
-        // console.log(library_items)
+    
         // (library_items)
         // setSelectedCigar(v)
         setSelectedGroup(v)
@@ -192,21 +191,16 @@ export default function AddHistory() {
         BackHandler.addEventListener('hardwareBackPress',  ()=> {
             const current:number=screen
             if (current>0){
-                console.log("hohohohohohoi")
                 setScreen(current>0?current-1:current);
                 setAvailableScreens(current>0?current-1:current)
                 return true
             }
             else{
-                console.log("ahahahah")
                 navigation.goBack()
                 return true
             }
         })
         database.async_select_from_table("Library").then((e)=>{
-            console.log("Library Items Start")
-            console.log(e)
-            console.log("Library Items End")
         })
 
 
@@ -231,7 +225,7 @@ export default function AddHistory() {
             return
         }
         if (is_dateable (item.date_used)==false || item.date_used.length==0){
-            // console.log(is_dateable (item.date_used))
+        
 
             Alert.alert("Error With Selected Date","It looks like there is a problem with selecting the Date\n\n", 
     
@@ -242,9 +236,6 @@ export default function AddHistory() {
                 return
             }
         if (Number.isNaN(item.total)|| item.total<0||item.total> (selectedGroup!=undefined ?selectedGroup?.total_number: 9999999)){
-            console.log("item.total")
-            console.log("item.total")
-            console.log("item.total")
             Alert.alert("Error With Selected Number of Cigars","Make sure you selected at least one and no more than the total you have in your group\n\n", 
     
             [
@@ -262,6 +253,7 @@ export default function AddHistory() {
             ])
             return
         }
+
         database.add_to_history(History)
         alert("Item Added Successfully")
         setTimeout(()=>{
@@ -298,7 +290,8 @@ export default function AddHistory() {
                         <react.Fragment>
                             {isCameraPressed ?
 
-                                <Camera style={{ flex: 1 }}></Camera>
+                                <Camera autoFocus  style={{ flex: 1 }}
+                                />
 
                                 :
 

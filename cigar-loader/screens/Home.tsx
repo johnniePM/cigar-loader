@@ -31,6 +31,7 @@ export default function Home() {
     const [selectedHumidorId, setSelectedHumidorId] = useState<number>()
     const [brandList, setBrandList] = useState<Array<DbBrand>>([])
     const [library, setLibrary] = useState<Array<DbLibrary>>([])
+    const [col,setCol]=useState<string>("")
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const database = UseDatabase()
     const settings = useSettings()
@@ -181,15 +182,13 @@ export default function Home() {
 
 
 
-
     }, [])
-
     useEffect(() => {
         // database.select_from_table("Brand", setBrand)
         // database.select_from_table("Library", database.handleLibraryList)
         // database.select_from_table("Cigar", database.handleCigarList)
         // database.select_from_table("Humidor", database.handleHumidorList)
-
+        setCol(theme.colors.elevation.level2.replace(")", ",128)"))
         if (isFocused) {
             set_cigar()
         }
@@ -292,7 +291,7 @@ export default function Home() {
                     contentContainerStyle={{ overflow: "visible", paddingTop: 50, paddingLeft: (SCREENWIDTH - 20 - (SCREENWIDTH * 0.65)) / 2, paddingRight: (SCREENWIDTH - 20 - (SCREENWIDTH * 0.65)) / 2, paddingBottom: 25 }}
                     showsHorizontalScrollIndicator={false}
                     snapToInterval={SCREENWIDTH * 0.65 + 20}
-                    onScroll={ReactAnimated.event(
+                    onScroll={ReactAnimated.event(  
                         [
                             {
                                 nativeEvent: { contentOffset: { x: animatedScrollYValue } },
@@ -321,7 +320,7 @@ export default function Home() {
 
                 </ReactAnimated.ScrollView>
                 {brandList.length == 0 &&
-                    <Text variant="headlineLarge" style={{ color: theme.colors.backdrop, paddingHorizontal: 25, alignSelf: "center", textAlign: "center", paddingBottom: 25 }} >No Cigars in the Following Humidor</Text>
+                    <Text variant="headlineLarge" style={{ color: theme.colors.backdrop, paddingHorizontal: 25, alignSelf: "center", textAlign: "center", paddingBottom: 75, marginTop:-50 }} >No Cigars in the Following Humidor</Text>
                 }
 
                 {settings.ShowQuickStats &&
@@ -402,21 +401,21 @@ export default function Home() {
             </ScreenWrapper>
 
             <FAB.Group
-                backdropColor={theme.colors.elevation.level2.replace(")", ",128)")}
+                backdropColor={col}
                 
                 open={open}
                 label={!open ? settings.QuickAdd : "ScaleDown"}
                 icon={open ? 'minus' : 'plus'}
                 actions={[
 
-                    { icon: 'cigar', label: 'Add new cigar', onPress: () => { navigation.navigate("AddCigar")}, labelTextColor:"#ffffff" },
-                    { icon: 'dresser-outline', label: 'Add New Humidor', onPress: () => { navigation.navigate("AddHumidor") }, labelTextColor:"#ffffff" },
+                    { icon: 'cigar', label: 'Add new cigar', onPress: () => { navigation.navigate("AddCigar")}, labelTextColor:"#333333" },
+                    { icon: 'dresser-outline', label: 'Add New Humidor', onPress: () => { navigation.navigate("AddHumidor") }, labelTextColor:"#333333" },
                     {
                         icon: 'content-save-edit',
                         label: 'Report Smoking a Cigar',
                         onPress: () => {navigation.navigate("AddHistory") },
                         size: theme.isV3 ? 'small' : 'medium',
-                        labelTextColor:"#ffffff",
+                        labelTextColor:"#333333",
 
                     },
                 ]}

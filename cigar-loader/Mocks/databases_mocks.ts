@@ -24,6 +24,10 @@ export const CreateCigarTable = `CREATE TABLE IF NOT EXISTS Cigar (
     FOREIGN KEY (brand_id) REFERENCES Brand (id)
 );`
 
+export const SeeTable=(name:string)=>{
+    return(
+    `PRAGMA table_info(${name});`)
+}
 
 export const CreateLibraryTable = `CREATE TABLE IF NOT EXISTS Library (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,6 +48,7 @@ export const CreateHistoryTable = `CREATE TABLE IF NOT EXISTS History (
         library_id INTEGER NOT NULL,
         date_used DATETIME NOT NULL,
         rate INTEGER NOT NULL,
+        total INTEGER NOT NULL,
         comment TEXT NOT NULL,
         self_used INTEGER NOT NULL,
         FOREIGN KEY (library_id) REFERENCES Library (id),
@@ -76,8 +81,8 @@ VALUES ('${library.qrCode}', '${library.cigar_id}' , '${library.total_number}' ,
 
 
 export const AddHistoryTable = (History: DbHistory) => {
-    return `INSERT INTO History (cigar_id, date_added, date_used, rate, comment, self_used)
-VALUES ('${History.cigar.id}', '${History.date_added}' , '${History.date_used}' , '${History.rate}' , '${History.comment}' , '${History.self_used}');`
+    return `INSERT INTO History (cigar_id,  date_used, rate, comment, self_used, library_id, total )
+VALUES ('${History.cigar_id}',  '${History.date_used}' , '${History.rate}' , '${History.comment}' , '${History.self_used}', '${History.library_id}','${History.total}');`
 }
 
 

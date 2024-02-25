@@ -6,7 +6,6 @@ import { RouteProp, useNavigation } from '@react-navigation/native';
 import { useTheme } from 'react-native-paper';
 import Home from '../screens/Home';
 import Cigar from '../screens/Cigar';
-import History from '../screens/History';
 import Library from '../screens/Library';
 import AddCigar from '../screens/AddCigar';
 import Settings from '../screens/Settings';
@@ -14,6 +13,7 @@ import AddHumidor from '../screens/AddHumidor';
 import { DbBrand, IHomeBrand } from '../constants';
 import Animated from 'react-native-reanimated';
 import AddHistory from '../screens/AddHistory';
+import HistoryScreen from '../screens/History';
 
 export type RootStackParamList = {
   Home: any;
@@ -67,7 +67,7 @@ export default () => {
 
       <Stack.Screen
         name="History"
-        component={History}
+        component={HistoryScreen}
         options={{}}
       // options={{title: 'Hem',}}
       />

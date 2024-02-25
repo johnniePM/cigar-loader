@@ -23,6 +23,7 @@ export interface IUseDatabase {
     handleHumidorList(): any;
     handleSelectedHumidor(): any;
     handleSelectedLibrary(): any;
+    see_table_columns(name:string):any
 }
 
 export interface IUseData {

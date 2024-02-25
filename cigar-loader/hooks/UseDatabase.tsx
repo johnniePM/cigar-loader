@@ -121,6 +121,21 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
     return id
   }, [])
 
+  const  see_table_columns=useCallback(async (name:string):Promise<any>=>{
+    let res:any
+    db.transactionAsync(async (exc) => {
+      await exc.executeSqlAsync(MDATABASE.SeeTable(name)).then((g) => {
+        console.log("start")
+        g.rows.map((v)=>{
+          console.log(v.name+" ------   "+v.type)
+
+        })
+        console.log("end")
+        res=g
+      }).catch((e)=>{console.log(e)})
+    })
+    return res
+  },[])
 
   const edit_table = useCallback((table: "Brand" | "Humidor" | "Cigar" | "Library" | "History", id: number, update: DbUpdate) => {
     db.transactionAsync(async (exc) => {
@@ -253,7 +268,8 @@ export const DatabaseProvider = ({ children }: { children: React.ReactNode }) =>
     selectedHumidor,
     selectedLibrary,
     HumidorList,
-    LibraryList
+    LibraryList,
+    see_table_columns,
 
     // articles,
     // setArticles,
