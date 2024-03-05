@@ -1,6 +1,6 @@
 import react, { useState, useEffect, useRef, Ref, createRef } from "react"
 import { Appbar, Chip, Surface, Text, TouchableRipple, TouchableRippleProps, useTheme, TextInput, Button, RadioButton, Switch } from "react-native-paper";
-import { SafeAreaView, View, LayoutAnimation, Pressable, ScrollView, VibrationStatic, Vibration, BackHandler, Alert } from "react-native";
+import { SafeAreaView, View, LayoutAnimation, Pressable, ScrollView, VibrationStatic, Vibration, BackHandler, Alert, GestureResponderEvent } from "react-native";
 import Animated, {
     useSharedValue,
     withTiming,
@@ -205,6 +205,9 @@ export default function AddHistory() {
 
 
     }, [screen])
+    useEffect(()=>{
+        Camera.requestCameraPermissionsAsync()
+    },[])
 
     const add_history=(item:DbHistory):void=>{
         if (typeof item.cigar_id != "number" || Number.isNaN(item.cigar_id)) {
@@ -290,7 +293,7 @@ export default function AddHistory() {
                         <react.Fragment>
                             {isCameraPressed ?
 
-                                <Camera autoFocus  style={{ flex: 1 }}
+                                <Camera autoFocus  style={{  aspectRatio:0.77, width:"100%",  }}
                                 />
 
                                 :
@@ -301,7 +304,7 @@ export default function AddHistory() {
                                 </View>
                             }
                             <View style={{ position: "absolute", height: "auto", backgroundColor: theme.colors.onSurfaceVariant, bottom: 10, alignSelf: "center", borderRadius: 40, overflow: "hidden", }}>
-                                <TouchableRipple onPressIn={() => { setIsCameraPressed(true) }} onPressOut={() => { setIsCameraPressed(false) }} onPress={() => { }} style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 40 }}>
+                                <TouchableRipple rippleColor={"#111"} onPressIn={(e:GestureResponderEvent) => { setIsCameraPressed(true) }} onPressOut={() => { setIsCameraPressed(false) }} onPress={() => { }} style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 40 }}>
                                     <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge"> Hold To Scan</Text>
                                 </TouchableRipple>
                             </View>
