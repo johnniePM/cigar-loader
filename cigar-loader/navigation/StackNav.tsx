@@ -13,7 +13,7 @@ import AddHumidor from '../screens/AddHumidor';
 import { DbBrand, IHomeBrand } from '../constants';
 import Animated from 'react-native-reanimated';
 import AddHistory from '../screens/AddHistory';
-import HistoryScreen from '../screens/History';
+import HistoryScreen from './HistoryTabs';
 
 export type RootStackParamList = {
   Home: any;
