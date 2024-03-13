@@ -82,7 +82,10 @@ export interface DbHistory {
     rate:string;
     comment:string;
     self_used:number;
-    total:number
+    total:number,
+    cigar:string;
+    brand:string;
+    humidor:string;
 }
     
     

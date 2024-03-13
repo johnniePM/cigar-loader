@@ -24,7 +24,7 @@ import { date_stringify, is_dateable } from "../services/helpers";
 const END_POSITION = 200;
 
 export default function AddHistory() {
-    
+
     const [isCameraPressed, setIsCameraPressed] = useState<boolean>(false)
     const [isStartScreen, setIsStartScreen] = useState<boolean>(true)
     const [screen, setScreen] = useState<number>(0)
@@ -47,7 +47,10 @@ export default function AddHistory() {
         rate: "5",
         self_used: 1,
         id: NaN,
-        total: 0
+        total: 0,
+        cigar: "",
+        brand: "",
+        humidor: ""
     })
     const progress = useSharedValue(5);
     const min = useSharedValue(0);
@@ -62,21 +65,21 @@ export default function AddHistory() {
         const currentDate = selectedDate;
         if (selectedDate != undefined) {
             setDate(selectedDate)
-            setHistory(prev=>({...prev, date_used:date_stringify(date)}))
+            setHistory(prev => ({ ...prev, date_used: date_stringify(date) }))
         }
     };
 
     const select_humidor = (v: DbHumidor) => {
         setSelectedHumidor(v)
         let library_items: DbLibrary[] = database.LibraryList
-        library_items=library_items.filter((e) => { return (e.humidor_id == v.id && e.total_number > 0) })
+        library_items = library_items.filter((e) => { return (e.humidor_id == v.id && e.total_number > 0) })
         const cigar_ids: Array<number> = library_items.reduce((accumulator: Array<number>, currentItem) => {
             // Assuming currentItem has a property called cigar_id
             const cigarId: number = currentItem.cigar_id;
 
             // Check if the cigar_id is not already in the accumulator array
-            const  checkCigarInHumidor:boolean=library_items.some((v)=>cigarId==v.cigar_id) 
-            if (!accumulator.includes(cigarId) &&  checkCigarInHumidor) {
+            const checkCigarInHumidor: boolean = library_items.some((v) => cigarId == v.cigar_id)
+            if (!accumulator.includes(cigarId) && checkCigarInHumidor) {
                 // If not, add it to the accumulator array
                 accumulator.push(cigarId);
             }
@@ -119,7 +122,7 @@ export default function AddHistory() {
     const select_brand = (v: DbBrand) => {
         setSelectedBrand(v)
         let library_items: DbLibrary[] = database.LibraryList
-        library_items=library_items.filter((e) => { return (e.humidor_id == selectedHumidor.id && e.total_number > 0) })
+        library_items = library_items.filter((e) => { return (e.humidor_id == selectedHumidor.id && e.total_number > 0) })
         setAvailableLibrary(library_items)
         const cigar_ids: Array<number> = library_items.reduce((accumulator: Array<number>, currentItem) => {
             const cigarId: number = currentItem.cigar_id;
@@ -147,7 +150,7 @@ export default function AddHistory() {
 
         const library_items: DbLibrary[] = database.LibraryList
         setAvailableLibrary(library_items.filter((e) => { return e.humidor_id == selectedHumidor.id && e.total_number > 0 && e.cigar_id == v.id }))
-    
+
         // (library_items)
         setSelectedCigar(v)
         setScreen(4);
@@ -161,11 +164,11 @@ export default function AddHistory() {
 
 
         // setAvailableLibrary(library_items.filter((e)=>{return e.humidor_id==selectedHumidor.id && e.total_number>0&&e.cigar_id==v.id }))
-    
+
         // (library_items)
         // setSelectedCigar(v)
         setSelectedGroup(v)
-        setHistory(prevstate => ({ ...prevstate, cigar_id: v.cigar_id, library_id:v.id }))
+        setHistory(prevstate => ({ ...prevstate, cigar_id: v.cigar_id, library_id: v.id }))
         setScreen(5);
         setAvailableScreens(5)
 
@@ -188,80 +191,85 @@ export default function AddHistory() {
 
     }, [isCameraPressed])
     useEffect(() => {
-        BackHandler.addEventListener('hardwareBackPress',  ()=> {
-            const current:number=screen
-            if (current>0){
-                setScreen(current>0?current-1:current);
-                setAvailableScreens(current>0?current-1:current)
+        BackHandler.addEventListener('hardwareBackPress', () => {
+            const current: number = screen
+            if (current > 0) {
+                setScreen(current > 0 ? current - 1 : current);
+                setAvailableScreens(current > 0 ? current - 1 : current)
                 return true
             }
-            else{
+            else {
                 navigation.goBack()
                 return true
             }
         })
-        database.async_select_from_table("Library").then((e)=>{
+        database.async_select_from_table("Library").then((e) => {
         })
 
 
     }, [screen])
-    useEffect(()=>{
+    useEffect(() => {
         Camera.requestCameraPermissionsAsync()
-    },[])
+    }, [])
 
-    const add_history=(item:DbHistory):void=>{
+    const add_history = (item: DbHistory): void => {
         if (typeof item.cigar_id != "number" || Number.isNaN(item.cigar_id)) {
-            Alert.alert("Error With Selected Cigar","It looks like there is a problem with selecting the cigar\n\n", 
-            [
-                {"isPreferred":true, onPress:()=>{},text:"Cancel" },
-                {"isPreferred":false, onPress:()=>{setScreen(3), setAvailableScreens(3)},text:"Select Cigar",style:"default"},
-            ])
-            return
-        }
-        if (typeof item.library_id != "number" || Number.isNaN(item.library_id)){
-            Alert.alert("Error With Selected Cigar","It looks like there is a problem with selecting the cigar\n\n", 
-
-            [
-                {"isPreferred":true, onPress:()=>{},text:"Cancel" },
-                {"isPreferred":false, onPress:()=>{setScreen(4), setAvailableScreens(4)},text:"Select Group",style:"default"},
-            ])
-            return
-        }
-        if (is_dateable (item.date_used)==false || item.date_used.length==0){
-        
-
-            Alert.alert("Error With Selected Date","It looks like there is a problem with selecting the Date\n\n", 
-    
+            Alert.alert("Error With Selected Cigar", "It looks like there is a problem with selecting the cigar\n\n",
                 [
-                    {"isPreferred":true, onPress:()=>{},text:"Cancel" },
-                    {"isPreferred":false, onPress:()=>{showDate()},text:"Select Date",style:"default"},
+                    { "isPreferred": true, onPress: () => { }, text: "Cancel" },
+                    { "isPreferred": false, onPress: () => { setScreen(3), setAvailableScreens(3) }, text: "Select Cigar", style: "default" },
                 ])
-                return
-            }
-        if (Number.isNaN(item.total)|| item.total<0||item.total> (selectedGroup!=undefined ?selectedGroup?.total_number: 9999999)){
-            Alert.alert("Error With Selected Number of Cigars","Make sure you selected at least one and no more than the total you have in your group\n\n", 
-    
-            [
-                {"isPreferred":true, onPress:()=>{},text:"Cancel" },
-                {"isPreferred":false, onPress:()=>{showDate()},text:"Select Date",style:"default"},
-            ])
             return
         }
-        if (Number.isNaN(parseInt(item.rate))||parseInt(item.rate)<0 ||parseInt(item.rate)>10){
-            Alert.alert("Error With Selected Rate","Please try to rate your expericnce once more\n\n", 
-    
-            [
-                {"isPreferred":true, onPress:()=>{},text:"Cancel" },
-                {"isPreferred":false, onPress:()=>{},text:"Rate Again",style:"default"},
-            ])
+        if (typeof item.library_id != "number" || Number.isNaN(item.library_id)) {
+            Alert.alert("Error With Selected Cigar", "It looks like there is a problem with selecting the cigar\n\n",
+
+                [
+                    { "isPreferred": true, onPress: () => { }, text: "Cancel" },
+                    { "isPreferred": false, onPress: () => { setScreen(4), setAvailableScreens(4) }, text: "Select Group", style: "default" },
+                ])
             return
+        }
+        if (is_dateable(item.date_used) == false || item.date_used.length == 0) {
+
+
+            Alert.alert("Error With Selected Date", "It looks like there is a problem with selecting the Date\n\n",
+
+                [
+                    { "isPreferred": true, onPress: () => { }, text: "Cancel" },
+                    { "isPreferred": false, onPress: () => { showDate() }, text: "Select Date", style: "default" },
+                ])
+            return
+        }
+        if (Number.isNaN(item.total) || item.total < 0 || item.total > (selectedGroup != undefined ? selectedGroup?.total_number : 9999999)) {
+            Alert.alert("Error With Selected Number of Cigars", "Make sure you selected at least one and no more than the total you have in your group\n\n",
+
+                [
+                    { "isPreferred": true, onPress: () => { }, text: "Cancel" },
+                    { "isPreferred": false, onPress: () => { showDate() }, text: "Select Date", style: "default" },
+                ])
+            return
+        }
+        if (Number.isNaN(parseInt(item.rate)) || parseInt(item.rate) < 0 || parseInt(item.rate) > 10) {
+            Alert.alert("Error With Selected Rate", "Please try to rate your expericnce once more\n\n",
+
+                [
+                    { "isPreferred": true, onPress: () => { }, text: "Cancel" },
+                    { "isPreferred": false, onPress: () => { }, text: "Rate Again", style: "default" },
+                ])
+            return
+        }
+        if (selectedCigar?.name != undefined && selectedBrand?.name != undefined && selectedHumidor.name != "") {
+
+            setHistory(prevState => ({ ...prevState, humidor: selectedHumidor.name, cigar: selectedCigar?.name, brand: selectedBrand?.name }))
+            database.add_to_history(History)
+            alert("Item Added Successfully")
+            setTimeout(() => {
+                navigation.goBack()
+            }, 500)
+
         }
 
-        database.add_to_history(History)
-        alert("Item Added Successfully")
-        setTimeout(()=>{
-            navigation.goBack()
-        },500)
 
         // Alert.prompt("Error With Selected Cigar","It looks like there is a problem with selecting the Cigar from your Humidor")
         // alert("Error While Selecting A Cigar. Please Try Again")
@@ -293,7 +301,7 @@ export default function AddHistory() {
                         <react.Fragment>
                             {isCameraPressed ?
 
-                                <Camera autoFocus  style={{  aspectRatio:0.77, width:"100%",  }}
+                                <Camera autoFocus style={{ aspectRatio: 0.77, width: "100%", }}
                                 />
 
                                 :
@@ -304,7 +312,7 @@ export default function AddHistory() {
                                 </View>
                             }
                             <View style={{ position: "absolute", height: "auto", backgroundColor: theme.colors.onSurfaceVariant, bottom: 10, alignSelf: "center", borderRadius: 40, overflow: "hidden", }}>
-                                <TouchableRipple rippleColor={"#111"} onPressIn={(e:GestureResponderEvent) => { setIsCameraPressed(true) }} onPressOut={() => { setIsCameraPressed(false) }} onPress={() => { }} style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 40 }}>
+                                <TouchableRipple rippleColor={"#111"} onPressIn={(e: GestureResponderEvent) => { setIsCameraPressed(true) }} onPressOut={() => { setIsCameraPressed(false) }} onPress={() => { }} style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 40 }}>
                                     <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge"> Hold To Scan</Text>
                                 </TouchableRipple>
                             </View>
@@ -317,7 +325,7 @@ export default function AddHistory() {
         return (
             <View style={{ height: "100%", width: "100%", overflow: "visible" }}>
                 <Appbar.Header elevated>
-                    <Appbar.BackAction onPress={() => { setScreen(screen>0?screen-1:screen); setAvailableScreens(screen>0?screen-1:screen) }} />
+                    <Appbar.BackAction onPress={() => { setScreen(screen > 0 ? screen - 1 : screen); setAvailableScreens(screen > 0 ? screen - 1 : screen) }} />
                     <Appbar.Content title={"Register a Smoked Cigar"} />
                 </Appbar.Header>
                 {/* <ReactAnimated.View style={{backgroundColor:"#8c5319", width:1, height:1, position:"absolute", top:"45%", left:"50%", transform:[{scale:animatedView}] , overflow:"visible", zIndex:1, borderRadius:0.1} }/> */}
@@ -487,9 +495,9 @@ export default function AddHistory() {
                                 </View>
 
                             </View>
-                            <View style={{flex:1, flexDirection:"row-reverse", marginBottom:20}}>
+                            <View style={{ flex: 1, flexDirection: "row-reverse", marginBottom: 20 }}>
                                 <View style={{ borderRadius: 40, backgroundColor: theme.colors.secondary, overflow: "hidden", justifyContent: "center", }}>
-                                    <TouchableRipple onPress={() => {add_history(History) }} style={{ flex: 1, paddingVertical: 15, paddingHorizontal: 50 }}>
+                                    <TouchableRipple onPress={() => { add_history(History) }} style={{ flex: 1, paddingVertical: 15, paddingHorizontal: 50 }}>
                                         <View>
                                             <Text style={{ color: theme.colors.onPrimary }} variant="bodyLarge" numberOfLines={1}>Report </Text>
                                         </View>

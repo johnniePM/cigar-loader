@@ -46,6 +46,9 @@ export const CreateHistoryTable = `CREATE TABLE IF NOT EXISTS History (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         cigar_id INTEGER NOT NULL,
         library_id INTEGER NOT NULL,
+        cigar TEXT NOT NULL,
+        humidor TEXT NOT NULL,
+        brand TEXT NOT NULL,    
         date_used DATETIME NOT NULL,
         rate INTEGER NOT NULL,
         total INTEGER NOT NULL,
@@ -81,8 +84,8 @@ VALUES ('${library.qrCode}', '${library.cigar_id}' , '${library.total_number}' ,
 
 
 export const AddHistoryTable = (History: DbHistory) => {
-    return `INSERT INTO History (cigar_id,  date_used, rate, comment, self_used, library_id, total )
-VALUES ('${History.cigar_id}',  '${History.date_used}' , '${History.rate}' , '${History.comment}' , '${History.self_used}', '${History.library_id}','${History.total}');`
+    return `INSERT INTO History (cigar_id,  date_used, rate, comment, self_used, library_id, total, cigar , humidor, brand )
+VALUES ('${History.cigar_id}',  '${History.date_used}' , '${History.rate}' , '${History.comment}' , '${History.self_used}', '${History.library_id}','${History.total}' , '${History.cigar}',  '${History.humidor}' ,  '${History.brand}');`
 }
 
 
