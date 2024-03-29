@@ -32,7 +32,7 @@ export default function HistoryTable() {
 
 
   const sort_by = (sorting: Sort) => {
-
+    console.log("hausjkd")
     var temp: DbHistory[] = sortedItems
     switch (sorting.type) {
       case 'date_used':
@@ -116,25 +116,25 @@ export default function HistoryTable() {
       <DataTable.Header>
         
         <DataTable.Title
-          onPressIn={
+          onPress={
             () => {
               sortBy.type == "cigar" ? sort_by({ order: sortBy.order == 0 ? 1 : sortBy.order == 1 ? 2 : 0, type: "cigar" }) : sort_by({ order: 1, type: "cigar" })
             }}
-          sortDirection={sortBy.type == "cigar" ? sortBy.order == 1 ? "ascending" : sortBy.order == 2 ? "descending" : undefined : undefined} onPress={() => { }} >Cigar</DataTable.Title>
+          sortDirection={sortBy.type == "cigar" ? sortBy.order == 1 ? "ascending" : sortBy.order == 2 ? "descending" : undefined : undefined}  >Cigar</DataTable.Title>
         <DataTable.Title
-          onPressIn={
+          onPress={
             () => {
               sortBy.type == "brand" ? sort_by({ order: sortBy.order == 0 ? 1 : sortBy.order == 1 ? 2 : 0, type: "brand" }) : sort_by({ order: 1, type: "brand" })
             }}
           sortDirection={sortBy.type == "brand" ? sortBy.order == 1 ? "ascending" : sortBy.order == 2 ? "descending" : undefined : undefined}>Brand</DataTable.Title>
         <DataTable.Title
-          onPressIn={
+          onPress={
             () => {
               sortBy.type == "date_used" ? sort_by({ order: sortBy.order == 0 ? 1 : sortBy.order == 1 ? 2 : 0, type: "date_used" }) : sort_by({ order: 1, type: "date_used" })
             }}
           sortDirection={sortBy.type == "date_used" ? sortBy.order == 1 ? "ascending" : sortBy.order == 2 ? "descending" : undefined : undefined}>Date</DataTable.Title>
         <DataTable.Title
-          onPressIn={
+          onPress={
             () => {
               sortBy.type == "rate" ? sort_by({ order: sortBy.order == 0 ? 1 : sortBy.order == 1 ? 2 : 0, type: "rate" }) : sort_by({ order: 1, type: "rate" })
             }}
