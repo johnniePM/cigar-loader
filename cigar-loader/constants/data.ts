@@ -2,46 +2,6 @@
 export type RingType= `${number} cm`|`${number} mm`
 
 
-export interface IBrand{
-    id?:number;
-    name:string;
-    origin:string
-}
-export interface IHumidor{
-    id?:number;
-    name:string;
-    total_capacity:string
-}
-
-
-export interface ICigar{
-    id?:number;
-    name:string;
-    brand:IBrand;
-    length:number;
-    smoking_time:number;
-    ring:RingType;
-}
-
-export interface ILibrary {
-    id?:number;
-    qrCode:string;
-    cigar:ICigar;
-    total_number:number;
-    price:number;
-    date_added:Date;
-    humidor:IHumidor;
-}
-
-export interface IHistory {
-    id?:number;
-    cigar:ICigar;
-    date_added:Date;
-    date_used:Date;
-    rate:string;
-    comment:string;
-    self_used:boolean
-}
 
 export interface DbBrand{
     id:number;
@@ -119,9 +79,8 @@ export interface ISettings extends IStorageSettings{
 }
 
 
-export interface IUpdate extends Partial<IHistory> , Partial<ILibrary> , Partial<ICigar> , Partial<IHumidor> , Partial<IBrand>{
     
-}
+
 export interface DbUpdate extends Partial<DbHistory> , Partial<DbLibrary> , Partial<DbCigar> , Partial<DbHumidor> , Partial<DbBrand>{
 }
 

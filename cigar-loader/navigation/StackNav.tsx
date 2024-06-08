@@ -13,7 +13,8 @@ import AddHumidor from '../screens/AddHumidor';
 import { DbBrand, IHomeBrand } from '../constants';
 import Animated from 'react-native-reanimated';
 import AddHistory from '../screens/AddHistory';
-import HistoryScreen from './HistoryTabs';
+import HistoryTable from '../screens/History';
+import History from '../screens/History';
 
 export type RootStackParamList = {
   Home: any;
@@ -64,10 +65,9 @@ export default () => {
 
       // options={{title: 'Hem',}}
       />
-
       <Stack.Screen
         name="History"
-        component={HistoryScreen}
+        component={History}
         options={{}}
       // options={{title: 'Hem',}}
       />

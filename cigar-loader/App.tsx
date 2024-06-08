@@ -4,6 +4,18 @@ import { DatabaseProvider } from './hooks/UseDatabase';
 import { Appearance, useColorScheme } from 'react-native';
 import Main from './Main';
 
+
+
+/*
+NOTES ON THE APP ARCHITETRE:
+
+
+
+
+
+*/ 
+
+
 export default function App() {
   const theme = useColorScheme()
   const appe = Appearance

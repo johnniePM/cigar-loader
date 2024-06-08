@@ -22,7 +22,7 @@ interface Sort {
 }
 
 
-export default function HistoryTable() {
+export default function History() {
   const [page, setPage] = React.useState<number>(0);
   const [numberOfItemsPerPageList] = React.useState<Array<number>>([10, 20, 50]);
   const [itemsPerPage, onItemsPerPageChange] = React.useState<number>(numberOfItemsPerPageList[0]);
