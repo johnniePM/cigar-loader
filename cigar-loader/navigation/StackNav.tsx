@@ -1,5 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import StackHeaderOptions from '../hooks/useScreenOptions';
 import { RouteProp, useNavigation } from '@react-navigation/native';
@@ -15,6 +16,7 @@ import Animated from 'react-native-reanimated';
 import AddHistory from '../screens/AddHistory';
 import HistoryTable from '../screens/History';
 import History from '../screens/History';
+import SearchDetail from '../screens/SearchDetail';
 
 export type RootStackParamList = {
   Home: any;
@@ -25,12 +27,13 @@ export type RootStackParamList = {
   Settings: any;
   AddHumidor: any;
   AddHistory: any;
+  SearchDetail:any
 };
 export type RootRouteProps<RouteName extends keyof RootStackParamList> = RouteProp<
   RootStackParamList,
   RouteName
 >;
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default () => {
   const navigation = useNavigation();
@@ -39,7 +42,7 @@ export default () => {
 
 
   return (
-    <Stack.Navigator screenOptions={screenOptions.stack} >
+    <Stack.Navigator screenOptions={screenOptions.stack}  >
       <Stack.Screen
         name="Home"
         component={Home}
@@ -86,6 +89,12 @@ export default () => {
       <Stack.Screen
         name="AddHistory"
         component={AddHistory}
+        options={{ headerShown: false }}
+      // options={{title: 'Hem',}}
+      />
+      <Stack.Screen
+        name="SearchDetail"
+        component={SearchDetail}
         options={{ headerShown: false }}
       // options={{title: 'Hem',}}
       />

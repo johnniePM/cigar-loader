@@ -1,7 +1,7 @@
 import { GestureResponderEvent, LayoutAnimation, StyleSheet, View, ScrollView, Dimensions, Image, Animated as ReactAnimated } from "react-native";
 import { Avatar, Button, Card, Chip, Divider, Drawer, FAB, List, MD3Colors, Menu, Portal, Searchbar, Surface, Text, useTheme } from "react-native-paper";
 import ScreenWrapper from "../components/ScreenWrapper";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSettings } from "../hooks/UseSettings";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CoffeeCard from "../components/Card";
@@ -12,6 +12,8 @@ import { UseDatabase } from "../hooks/UseDatabase";
 import { DbBrand, DbHumidor, DbLibrary, IBrand, IHomeInfo, IHumidor } from "../constants";
 import { SelectFromTable } from "../Mocks/databases_mocks";
 import { checkIsBrand, checkIsCigar, checkIsHumidor, checkIsLibrary } from "../services/guards";
+import Animated from 'react-native-reanimated';
+import AnimatedSearchbar from "../components/CustomSearch";
 
 
 type ContextualMenuCoord = { x: number; y: number };
@@ -20,6 +22,9 @@ const SCREENWIDTH = Dimensions.get("window").width;
 const SCREENHEIGHT = Dimensions.get("window").height;
 const ELEMENTWIDTH = SCREENWIDTH - 32 - 32;
 const SPACING = (SCREENWIDTH - ELEMENTWIDTH) / 2;
+
+
+
 export default function Home() {
     const [visible, setVisible] = useState<boolean>(false);
     const [expanded, setExpanded] = useState<boolean>(false);
@@ -31,19 +36,13 @@ export default function Home() {
     const [selectedHumidorId, setSelectedHumidorId] = useState<number>()
     const [brandList, setBrandList] = useState<Array<DbBrand>>([])
     const [library, setLibrary] = useState<Array<DbLibrary>>([])
-    const [col,setCol]=useState<string>("")
+    const [col, setCol] = useState<string>("")
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const database = UseDatabase()
     const settings = useSettings()
     const scrollRef = useRef<ScrollView>(null)
     const animatedScrollYValue = useRef(new ReactAnimated.Value(0)).current;
-    // const animatedView = useRef(new ReactAnimated.Value(1)).current;
-    // const handle_pressed=()=>{
-    //     // ReactAnimated.timing(animatedView,{toValue:SCREENHEIGHT/2, useNativeDriver:true, duration:500}).start(
 
-    //     //     ()=>ReactAnimated.timing(animatedView,{toValue:1, useNativeDriver:true, duration:500}).start()
-    //     // )
-    // }
 
     const LAYOUT = LayoutAnimation.create(300, "easeInEaseOut", "opacity");
     const isFocused = useIsFocused()
@@ -58,13 +57,13 @@ export default function Home() {
     };
     const theme = useTheme()
     async function set_cigar(selected_humidor?: number) {
-        var home: IHomeInfo = { "humidor_id":NaN,"humidor_name": "", "humidor_capacity": 0, "brands": {} }
+        var home: IHomeInfo = { "humidor_id": NaN, "humidor_name": "", "humidor_capacity": 0, "brands": {} }
         var lib: Array<{ cigar_id: number, price: number, total: number, brand_id: number }> = []
         await database.async_select_from_table("Humidor").then(async (list_h) => {
             if (checkIsHumidor(list_h)) {
                 setHumidorList(list_h)
                 list_h.map((v) => {
-                    home = { "humidor_name": v.name, "humidor_capacity": parseInt(v.total_capacity), "brands": {}, "humidor_id":NaN }
+                    home = { "humidor_name": v.name, "humidor_capacity": parseInt(v.total_capacity), "brands": {}, "humidor_id": NaN }
 
                 })
                 if (typeof list_h[0].id != "undefined") {
@@ -76,7 +75,7 @@ export default function Home() {
 
                     if (typeof selected_humidor == "undefined") { return (database.async_select_from_table("Library")) }
                     else {
-                        home.humidor_id=selected_humidor
+                        home.humidor_id = selected_humidor
                         return (
                             database.async_select_from_table("Library", selected_humidor, "humidor_id")
                         )
@@ -92,7 +91,7 @@ export default function Home() {
 
                 if (checkIsLibrary(e)) {
                     var cigar_ids: Array<number> = []
-                    
+
                     e.map((v) => {
                         const lib_index = lib.findIndex(obj => obj.cigar_id === v.cigar_id)
                         if (!cigar_ids.includes(v.cigar_id)) {
@@ -230,29 +229,29 @@ export default function Home() {
         });
         if (homeInfo?.brands[item.id] == undefined) {
         }
-        if (homeInfo?.brands[item.id]!=undefined){
+        if (homeInfo?.brands[item.id] != undefined) {
 
             return (
                 <ReactAnimated.View
-                style={{
-                    width: SCREENWIDTH * 0.65,
-                    alignItems: "center",
-                    overflow: "visible",
-                    transform: [
-                        { scale: scale },
-                        { translateX: translate }
-                    ],
-                    marginRight: 20
-                }} >
-                
+                    style={{
+                        width: SCREENWIDTH * 0.65,
+                        alignItems: "center",
+                        overflow: "visible",
+                        transform: [
+                            { scale: scale },
+                            { translateX: translate }
+                        ],
+                        marginRight: 20
+                    }} >
+
                     <CoffeeCard onPress={() => {
                         // handle_pressed() ;
-                        navigation.navigate("Library", {"info":homeInfo.brands[item.id], "brand": item, "index":homeInfo.humidor_id})
-                        }} brand={item} info={homeInfo?.brands[item.id]} />
-                
-            </ReactAnimated.View>
-        )
-    }
+                        navigation.navigate("Library", { "info": homeInfo.brands[item.id], "brand": item, "index": homeInfo.humidor_id })
+                    }} brand={item} info={homeInfo?.brands[item.id]} />
+
+                </ReactAnimated.View>
+            )
+        }
     }
 
     return (
@@ -261,11 +260,14 @@ export default function Home() {
             {/* <ReactAnimated.View style={{backgroundColor:"#8c5319", width:1, height:1, position:"absolute", top:"45%", left:"50%", transform:[{scale:animatedView}] , overflow:"visible", zIndex:1, borderRadius:0.1} }/> */}
 
             <ScreenWrapper >
-                <Searchbar
-                    placeholder="Search"
-                    onChangeText={(query: string) => setFirstQuery(query)}
-                    value={firstQuery}
+                <AnimatedSearchbar
+                    setFirstQuery={()=>navigation.navigate('SearchDetail')}
+                    onPress={()=>navigation.navigate('SearchDetail')}
+                    firstQuery={firstQuery}
                     style={{ marginVertical: 10, marginHorizontal: 25, marginBottom: 20 }}
+                    sharedTransitionTag="tag"
+
+
                 />
                 <ScrollView horizontal style={{ paddingHorizontal: 25, marginBottom: 20 }} showsHorizontalScrollIndicator={false}>
                     <Surface elevation={0} style={{ flexDirection: "row", columnGap: 20, rowGap: 20, marginBottom: 10, paddingRight: 25 }} >
@@ -291,7 +293,7 @@ export default function Home() {
                     contentContainerStyle={{ overflow: "visible", paddingTop: 50, paddingLeft: (SCREENWIDTH - 20 - (SCREENWIDTH * 0.65)) / 2, paddingRight: (SCREENWIDTH - 20 - (SCREENWIDTH * 0.65)) / 2, paddingBottom: 25 }}
                     showsHorizontalScrollIndicator={false}
                     snapToInterval={SCREENWIDTH * 0.65 + 20}
-                    onScroll={ReactAnimated.event(  
+                    onScroll={ReactAnimated.event(
                         [
                             {
                                 nativeEvent: { contentOffset: { x: animatedScrollYValue } },
@@ -320,7 +322,7 @@ export default function Home() {
 
                 </ReactAnimated.ScrollView>
                 {brandList.length == 0 &&
-                    <Text variant="headlineLarge" style={{ color: theme.colors.backdrop, paddingHorizontal: 25, alignSelf: "center", textAlign: "center", paddingBottom: 75, marginTop:-50 }} >No Cigars in the Following Humidor</Text>
+                    <Text variant="headlineLarge" style={{ color: theme.colors.backdrop, paddingHorizontal: 25, alignSelf: "center", textAlign: "center", paddingBottom: 75, marginTop: -50 }} >No Cigars in the Following Humidor</Text>
                 }
 
                 {settings.ShowQuickStats &&
@@ -402,20 +404,20 @@ export default function Home() {
 
             <FAB.Group
                 backdropColor={col}
-                
+
                 open={open}
                 label={!open ? settings.QuickAdd : "ScaleDown"}
                 icon={open ? 'minus' : 'plus'}
                 actions={[
 
-                    { icon: 'cigar', label: 'Add new cigar', onPress: () => { navigation.navigate("AddCigar")}, labelTextColor:"#333333" },
-                    { icon: 'dresser-outline', label: 'Add New Humidor', onPress: () => { navigation.navigate("AddHumidor") }, labelTextColor:"#333333" },
+                    { icon: 'cigar', label: 'Add new cigar', onPress: () => { navigation.navigate("AddCigar") }, labelTextColor: "#333333" },
+                    { icon: 'dresser-outline', label: 'Add New Humidor', onPress: () => { navigation.navigate("AddHumidor") }, labelTextColor: "#333333" },
                     {
                         icon: 'content-save-edit',
                         label: 'Report Smoking a Cigar',
-                        onPress: () => {navigation.navigate("AddHistory") },
+                        onPress: () => { navigation.navigate("AddHistory") },
                         size: theme.isV3 ? 'small' : 'medium',
-                        labelTextColor:"#333333",
+                        labelTextColor: "#333333",
 
                     },
                 ]}
